@@ -5,42 +5,55 @@
 #include <stdlib.h>
 #include <string.h>
 
-void rlInitWindow(int width, int height, char* title) {
+
+void rlwInitWindow(int width, int height, char* title) {
     InitWindow(width, height, title);
     SetWindowMonitor(0);
 }
 
-void rlCloseWindow() {
+void rlwCloseWindow() {
     CloseWindow();
 }
 
-void rlBeginDrawing() {
+void rlwBeginDrawing() {
     BeginDrawing();
 }
 
-void rlEndDrawing() {
+void rlwEndDrawing() {
     EndDrawing();
 }
 
-void* rlCreateTexture(int width, int height) {
-    Texture t = LoadTextureFromImage(GenImageColor(width, height, BLACK));
-
-    void* ret = malloc(sizeof(Texture));
-    memcpy(ret, &t, sizeof(Texture));
-
-    return ret;
+int rlwGetTextureWidth(void* texture) {
+    return ((Texture*)texture)->width;
 }
 
-void rlUpdateTexture(void* texture, uint8_t* data) {
-    UpdateTexture(*((Texture*)texture), data);
+int rlwGetTextureHeight(void* texture) {
+    return ((Texture*)texture)->height;
 }
 
-void rlDrawTexture(void* texture) {
+void* rlwCreateTexture(int width, int height) {
+    Image img = GenImageColor(width, height, WHITE);
+    Texture* t = malloc(sizeof(Texture));
+    *t = LoadTextureFromImage(img);
+    UnloadImage(img);
+    return t;
+}
+
+void rlwUpdateTexture(void* texture, uint8_t* data) {
+    Texture* t = (Texture*)texture;
+    UpdateTexture(*t, data);
+}
+
+void rlwDrawTexture(void* texture) {
     DrawTexture(
-        *((Texture*)texture),
+        *(Texture*)texture,
         0, 0,
         WHITE
     );
+}
+
+bool rlIsKeyDown(uint32_t keycode) {
+    return IsKeyDown(keycode);
 }
 
 #endif
