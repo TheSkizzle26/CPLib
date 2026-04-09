@@ -33,8 +33,8 @@ void render() {
     cpClearBackground(BLACK);
 
     cpDrawLine(
-        100, 100,
         0, 0,
+        100, 100,
         RED
     );
 
