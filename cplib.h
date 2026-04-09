@@ -114,9 +114,9 @@ void cpBeginDrawing();
 void cpEndDrawing(); // also fetch inputs
 
 void cpClearBackground(cpColor tint);
-void cpDrawPixel(uint x, uint y, cpColor tint);
-void cpDrawLine(uint x1, uint y1, uint x2, uint y2, cpColor tint);
-void cpDrawRectangle(uint x, uint y, uint w, uint h, cpColor tint);
+void cpDrawPixel(int x, int y, cpColor tint);
+void cpDrawLine(int x1, int y1, int x2, int y2, cpColor tint);
+void cpDrawRectangle(int x, int y, int w, int h, cpColor tint);
 
 bool cpIsKeyDown(uint keyIdx);
 bool cpIsKeyPressed(uint keyIdx);

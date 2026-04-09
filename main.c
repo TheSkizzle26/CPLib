@@ -19,6 +19,7 @@ APP_VERSION("0.0.0")
 
 
 static bool is_running;
+static int tick;
 
 
 void update() {
@@ -31,11 +32,14 @@ void render() {
     cpBeginDrawing();
     cpClearBackground(BLACK);
 
-    for (int j = 0; j < 100; j++)
-        cpDrawPixel(j, j, RED);
+    cpDrawLine(
+        100, 100,
+        0, 0,
+        RED
+    );
 
     cpDrawRectangle(
-        150,
+        tick,
         250,
         100,
         50,
@@ -53,6 +57,8 @@ int main() {
     while (is_running) {
         update();
         render();
+
+        tick++;
     }
 
     cpQuit();

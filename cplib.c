@@ -230,17 +230,68 @@ inline void cpClearBackground(const cpColor tint) {
     memset(pixelBuf, tint, (int)sizeof(uint16_t) * numPixels);
 }
 
-inline void cpDrawPixel(const uint x, const uint y, const cpColor tint) {
+// TODO: add bounds checking, improve performance using dmac (i think thats what it's called)
+
+inline void cpDrawPixel(const int x, const int y, const cpColor tint) {
     pixelBuf[y*screenWidth + x] = tint;
 }
 
-inline void cpDrawLine(uint x1, uint y1, uint x2, uint y2, cpColor tint) {
+inline void cpDrawLine(int x1, int y1, int x2, int y2, cpColor tint) {
+    // bresenham line algorithm, based on https://saturncloud.io/blog/bresenham-line-algorithm-a-powerful-tool-for-efficient-line-drawing/
+    int dx = x2 - x1; if (dx < 0) dx *= -1;
+    int dy = y2 - y1; if (dy < 0) dy *= -1;
+    bool slope = dy > dx;
 
+    if (slope) {
+        int temp = x1;
+        x1 = y1;
+        y1 = temp;
+
+        temp = x2;
+        x2 = y2;
+        y2 = temp;
+    }
+
+    if (x1 > x2) {
+        int temp = x1;
+        x1 = x2;
+        x2 = temp;
+
+        temp = y1;
+        y1 = y2;
+        y2 = temp;
+    }
+
+    dx = x2 - x1; if (dx < 0) dx *= -1;
+    dy = y2 - y1; if (dy < 0) dy *= -1;
+    int error = dx / 2;
+    int y = y1;
+    int ystep = y1 < y2 ? 1 : -1;
+
+    for (int x = x1; x < x2+1; x++) {
+        int sx, sy;
+
+        if (slope) {
+            sx = y;
+            sy = x;
+        } else {
+            sx = x;
+            sy = y;
+        }
+
+        error -= dy;
+        if (error < 0) {
+            y += ystep;
+            error += dx;
+        }
+
+        cpDrawPixel(sx, sy, tint);
+    }
 }
 
-void cpDrawRectangle(const uint x, const uint y, const uint w, const uint h, const cpColor tint) {
-    for (uint sy = y; sy < y+h; sy++) {
-        for (uint sx = x; sx < x+w; sx++) {
+void cpDrawRectangle(const int x, const int y, const int w, const int h, const cpColor tint) {
+    for (int sy = y; sy < y+h; sy++) {
+        for (int sx = x; sx < x+w; sx++) {
             cpDrawPixel(sx, sy, tint);
         }
     }
