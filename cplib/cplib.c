@@ -31,11 +31,9 @@ void* memcpy(void *destination, const void *source, int num);
 void* memset(void *ptr, int value, int num);
 #endif
 
-void CALC_getKey(uint32_t *key1, uint32_t *key2);
-
-
 // keys
 #define NUM_KEYS 34
+void CALC_getKey(uint32_t *key1, uint32_t *key2);
 
 #ifdef TARGET_PC
 static uint32_t keyCodes[NUM_KEYS] = {
