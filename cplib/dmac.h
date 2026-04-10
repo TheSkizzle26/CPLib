@@ -185,7 +185,7 @@ union dmac_dmaor
 inline bool dma_wait(volatile dmac_chcr *chcr) 
 {
   // Check if DMA was never running
-  if (unlikely(!chcr->DE || !DMAC_DMAOR->DME)) 
+  if (__builtin_expect(!!(!chcr->DE || !DMAC_DMAOR->DME), 0))
   {
     return true;
   }
