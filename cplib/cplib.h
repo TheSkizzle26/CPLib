@@ -62,8 +62,7 @@ typedef uint16_t cpColor;
 #define RAYWHITE 63422
 
 
-typedef enum cpOverclockMultipliers cpOverclockMultipliers;
-enum cpOverclockMultipliers {
+typedef enum {
     OC_MUL_12 = 0x05,
     OC_MUL_16 = 0x07,
     OC_MUL_24 = 0x0B,
@@ -73,10 +72,9 @@ enum cpOverclockMultipliers {
     OC_MUL_48 = 0x17,
 
     OC_MUL_DEFAULT = 0x0F, // same as OC_MUL_32
-};
+} cpOverclockMultipliers;
 
-typedef enum cpKeyIndices cpKeyIndices;
-enum cpKeyIndices {
+typedef enum {
     KEY_SHIFT		= 0,
     KEY_CLEAR		= 1, //The Power key
     KEY_BACKSPACE	= 2,
@@ -112,7 +110,7 @@ enum cpKeyIndices {
     KEY_5			= 31,
     KEY_7			= 32,
     KEY_8			= 33,
-};
+} cpKeyIndices;
 
 
 void cpInit();
