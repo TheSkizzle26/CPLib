@@ -6,10 +6,8 @@
  * Also doesn't require the hollyhock-2 SDK, as it is included in this lib.
  *
  * If you would like to use this in another project,
- * just copy the cplib.*, cplib_os.s, raylib_wrapper.*, Makefile and linker.d
- * files to your project.
- *
- * Don't know how to get newlib working though.
+ * just copy the cplib folder to your project and take a look
+ * at this example script. You may also want to copy linker.ld and Makefile.
  */
 
 
@@ -21,13 +19,13 @@ APP_AUTHOR("TheSkizzle")
 APP_VERSION("0.0.0")
 
 
-static bool is_running;
+static bool isRunning;
 static int tick;
 
 
 void update() {
     if (cpIsKeyPressed(KEY_CLEAR)) {
-        is_running = false;
+        isRunning = false;
     }
 }
 
@@ -48,10 +46,10 @@ int main() {
     cpSetTargetFPS(60);
     cpSetOverclock(OC_MUL_48);
 
-    is_running = true;
+    isRunning = true;
 
     // ReSharper disable once CppDFALoopConditionNotUpdated
-    while (is_running) {
+    while (isRunning) {
         update();
         render();
 
