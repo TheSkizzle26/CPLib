@@ -114,7 +114,7 @@ static uint32_t keyCodes[NUM_KEYS] = {
 
 static int screenWidth, screenHeight;
 static int numPixels;
-static cpColor* pixelBuf;
+static cpColor* pixelBuf __attribute__((aligned(32)));
 
 static bool keyState[NUM_KEYS];
 static bool lastKeyState[NUM_KEYS];
@@ -131,18 +131,18 @@ void cpInit() {
 #ifdef TARGET_PC
     screenWidth = 320;
     screenHeight = 528;
+    numPixels = screenWidth * screenHeight;
     rlwInitWindow(screenWidth, screenHeight, "CPLib emu");
 
     rlTexture = rlwCreateTexture(screenWidth, screenHeight);
-    rlPixelBuf = (uint8_t*)malloc(sizeof(uint8_t) * 4*screenWidth*screenHeight);
-    memset(rlPixelBuf, 0, (int)sizeof(uint8_t) * 4*screenWidth*screenHeight);
+    rlPixelBuf = (uint8_t*)malloc(sizeof(uint8_t) * 4*numPixels);
+    memset(rlPixelBuf, 0, (int)sizeof(uint8_t) * 4*numPixels);
 #else
     CALC_LCD_GetSize(&screenWidth, &screenHeight);
+    numPixels = screenWidth * screenHeight;
     calcVRAM = CALC_LCD_GetVRAMAddress();
     CALC_LCD_VRAMBackup();
 #endif
-
-    numPixels = screenWidth * screenHeight;
 
     pixelBuf = (cpColor*)malloc(sizeof(cpColor) * numPixels);
     memset(pixelBuf, 0, (int)sizeof(cpColor) * numPixels);
@@ -238,7 +238,7 @@ inline void cpDrawLine(int x1, int y1, int x2, int y2, cpColor tint) {
     // bresenham line algorithm, based on https://saturncloud.io/blog/bresenham-line-algorithm-a-powerful-tool-for-efficient-line-drawing/
     int dx = x2 - x1; if (dx < 0) dx *= -1;
     int dy = y2 - y1; if (dy < 0) dy *= -1;
-    bool slope = dy > dx;
+    const bool slope = dy > dx;
 
     if (slope) {
         int temp = x1;
