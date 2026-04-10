@@ -62,7 +62,21 @@ typedef uint16_t cpColor;
 #define RAYWHITE 63422
 
 
-enum KeyIndices {
+typedef enum cpOverclockMultipliers cpOverclockMultipliers;
+enum cpOverclockMultipliers {
+    OC_MUL_12 = 0x05,
+    OC_MUL_16 = 0x07,
+    OC_MUL_24 = 0x0B,
+    OC_MUL_30 = 0x0E,
+    OC_MUL_32 = 0x0F,
+    OC_MUL_36 = 0x11,
+    OC_MUL_48 = 0x17,
+
+    OC_MUL_DEFAULT = 0x0F, // same as OC_MUL_32
+};
+
+typedef enum cpKeyIndices cpKeyIndices;
+enum cpKeyIndices {
     KEY_SHIFT		= 0,
     KEY_CLEAR		= 1, //The Power key
     KEY_BACKSPACE	= 2,
@@ -104,6 +118,8 @@ enum KeyIndices {
 void cpInit();
 void cpQuit();
 
+void cpSetOverclock(cpOverclockMultipliers mul);
+
 cpColor cpRGBtoColor(uint8_t r, uint8_t g, uint8_t b);
 
 uint cpGetScreenWidth();
@@ -118,10 +134,10 @@ void cpDrawPixel(int x, int y, cpColor tint);
 void cpDrawLine(int x1, int y1, int x2, int y2, cpColor tint);
 void cpDrawRectangle(int x, int y, int w, int h, cpColor tint);
 
-bool cpIsKeyDown(uint keyIdx);
-bool cpIsKeyPressed(uint keyIdx);
-bool cpIsKeyUp(uint keyIdx);
-bool cpIsKeyReleased(uint keyIdx);
+bool cpIsKeyDown(cpKeyIndices keyIdx);
+bool cpIsKeyPressed(cpKeyIndices keyIdx);
+bool cpIsKeyUp(cpKeyIndices keyIdx);
+bool cpIsKeyReleased(cpKeyIndices keyIdx);
 
 
 #endif //CPLIB_CPLIB_H

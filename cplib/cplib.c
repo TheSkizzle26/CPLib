@@ -8,6 +8,8 @@
 
 #ifdef TARGET_PC
 #include "raylib_wrapper.h"
+#else
+#include "cpg.h"
 #endif
 
 
@@ -152,11 +154,23 @@ void cpQuit() {
 #ifdef TARGET_PC
     rlwCloseWindow();
 #else
+    // reset clock speed
+    cpg_set_pll_mul(OC_MUL_DEFAULT);
+
+    // restore lcd
     CALC_LCD_VRAMRestore();
     CALC_LCD_Refresh();
 #endif
 
     free(pixelBuf);
+}
+
+void cpSetOverclock(cpOverclockMultipliers mul) {
+#ifdef TARGET_PC
+    mul *= 1; // don't throw unused warning
+#else
+    cpg_set_pll_mul(mul);
+#endif
 }
 
 inline cpColor cpRGBtoColor(const uint8_t r, const uint8_t g, const uint8_t b) {
@@ -295,18 +309,18 @@ void cpDrawRectangle(const int x, const int y, const int w, const int h, const c
     }
 }
 
-bool cpIsKeyDown(const uint keyIdx) {
+bool cpIsKeyDown(const cpKeyIndices keyIdx) {
     return keyState[keyIdx];
 }
 
-bool cpIsKeyPressed(const uint keyIdx) {
+bool cpIsKeyPressed(const cpKeyIndices keyIdx) {
     return keyState[keyIdx] && !lastKeyState[keyIdx];
 }
 
-bool cpIsKeyUp(const uint keyIdx) {
+bool cpIsKeyUp(const cpKeyIndices keyIdx) {
     return !keyState[keyIdx];
 }
 
-bool cpIsKeyReleased(const uint keyIdx) {
+bool cpIsKeyReleased(const cpKeyIndices keyIdx) {
     return !keyState[keyIdx] && lastKeyState[keyIdx];
 }

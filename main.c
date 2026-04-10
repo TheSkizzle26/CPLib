@@ -46,11 +46,19 @@ void render() {
         SKYBLUE
     );
 
+    cpDrawLine(
+        0, 0,
+        tick, 0,
+        WHITE
+    );
+
     cpEndDrawing();
 }
 
 int main() {
     cpInit();
+    cpSetOverclock(OC_MUL_48);
+
     is_running = true;
 
     // ReSharper disable once CppDFALoopConditionNotUpdated
