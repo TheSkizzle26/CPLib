@@ -15,6 +15,10 @@ void rlwCloseWindow() {
     CloseWindow();
 }
 
+void rlwSetTargetFPS(int value) {
+    SetTargetFPS(value);
+}
+
 void rlwBeginDrawing() {
     BeginDrawing();
 }
@@ -52,7 +56,7 @@ void rlwDrawTexture(void* texture) {
     );
 }
 
-bool rlIsKeyDown(uint32_t keycode) {
+bool rlwIsKeyDown(uint32_t keycode) {
     return IsKeyDown(keycode);
 }
 

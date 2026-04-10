@@ -2,6 +2,13 @@
 // Created by timo on 09.04.26.
 //
 
+/*
+ * TODO:
+ * - add CALC_* prefix to cmt, power, etc.
+ * - use dmac for rendering
+ * - add clipping for rendering
+ */
+
 #include "cplib.h"
 #include <stdint.h>
 #include <stdbool.h>
@@ -10,6 +17,8 @@
 #include "raylib_wrapper.h"
 #else
 #include "cpg.h"
+#include "cmt.h"
+#include "power.h"
 #endif
 
 
@@ -140,14 +149,20 @@ void cpInit() {
     rlPixelBuf = (uint8_t*)malloc(sizeof(uint8_t) * 4*numPixels);
     memset(rlPixelBuf, 0, (int)sizeof(uint8_t) * 4*numPixels);
 #else
+    // init lcd
     CALC_LCD_GetSize(&screenWidth, &screenHeight);
     numPixels = screenWidth * screenHeight;
     calcVRAM = CALC_LCD_GetVRAMAddress();
     CALC_LCD_VRAMBackup();
+
+    // init timers
+    POWER_MSTPCR0->CMT = 0;
 #endif
 
     pixelBuf = (cpColor*)malloc(sizeof(cpColor) * numPixels);
     memset(pixelBuf, 0, (int)sizeof(cpColor) * numPixels);
+
+    cpSetTargetFPS(0);
 }
 
 void cpQuit() {
@@ -160,9 +175,26 @@ void cpQuit() {
     // restore lcd
     CALC_LCD_VRAMRestore();
     CALC_LCD_Refresh();
+
+    // stop timers
+    cmt_stop();
+    POWER_MSTPCR0->CMT = 0;
 #endif
 
     free(pixelBuf);
+}
+
+void cpSetTargetFPS(const int value) {
+#ifdef TARGET_PC
+    rlwSetTargetFPS(value);
+#else
+    if (value <= 0) {
+        // infinite
+        cmt_stop();
+    } else {
+        cmt_set(CMT_TICKS_PER_SEC / value, CMT_MODE_ONE_SHOT, CMT_REQUEST_DISABLE);
+    }
+#endif
 }
 
 void cpSetOverclock(cpOverclockMultipliers mul) {
@@ -193,6 +225,9 @@ inline uint16_t* cpGetFramebuffer() {
 inline void cpBeginDrawing() {
 #ifdef TARGET_PC
     rlwBeginDrawing();
+#else
+    // start frame timer
+    cmt_start();
 #endif
 }
 
@@ -220,7 +255,7 @@ void cpEndDrawing() {
 
     // fetch key states
     for (int i = 0; i < NUM_KEYS; i++) {
-        keyState[i] = rlIsKeyDown(keyCodes[i]);
+        keyState[i] = rlwIsKeyDown(keyCodes[i]);
     }
 #else
     memcpy(calcVRAM, pixelBuf, (int)sizeof(uint16_t) * numPixels);
@@ -235,6 +270,9 @@ void cpEndDrawing() {
 
         keyState[i] = !!((i < 10 ? key1 : key2) & keycode);
     }
+
+    // wait till we reach out target fps
+    cmt_wait();
 #endif
 }
 

@@ -125,6 +125,7 @@ typedef enum {
 
 void rlwInitWindow(int width, int height, char* title);
 void rlwCloseWindow();
+void rlwSetTargetFPS(int value);
 void rlwBeginDrawing();
 void rlwEndDrawing();
 int rlwGetTextureWidth(void* texture);
@@ -132,7 +133,7 @@ int rlwGetTextureHeight(void* texture);
 void* rlwCreateTexture(int width, int height);
 void rlwUpdateTexture(void* texture, uint8_t* data);
 void rlwDrawTexture(void* texture);
-bool rlIsKeyDown(uint32_t keycode);
+bool rlwIsKeyDown(uint32_t keycode);
 
 
 #endif

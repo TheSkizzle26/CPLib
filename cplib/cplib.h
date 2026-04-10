@@ -118,6 +118,7 @@ enum cpKeyIndices {
 void cpInit();
 void cpQuit();
 
+void cpSetTargetFPS(int value);
 void cpSetOverclock(cpOverclockMultipliers mul);
 
 cpColor cpRGBtoColor(uint8_t r, uint8_t g, uint8_t b);
@@ -127,7 +128,7 @@ uint cpGetScreenHeight();
 uint16_t* cpGetFramebuffer();
 
 void cpBeginDrawing();
-void cpEndDrawing(); // also fetch inputs
+void cpEndDrawing();
 
 void cpClearBackground(cpColor tint);
 void cpDrawPixel(int x, int y, cpColor tint);

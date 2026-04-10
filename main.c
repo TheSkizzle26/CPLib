@@ -1,6 +1,9 @@
 /*
  * Basically just raylib for the classpad II.
  * Can't do much at the moment.
+ * Edit: can actually do quite a bit now.
+ *
+ * Also doesn't require the hollyhock-2 SDK, as it is included in this lib.
  *
  * If you would like to use this in another project,
  * just copy the cplib.*, cplib_os.s, raylib_wrapper.*, Makefile and linker.d
@@ -57,6 +60,7 @@ void render() {
 
 int main() {
     cpInit();
+    cpSetTargetFPS(5);
     cpSetOverclock(OC_MUL_48);
 
     is_running = true;

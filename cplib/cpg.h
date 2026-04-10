@@ -5,9 +5,7 @@
 
 // SH7724 Clock Pulse Generator 
 
-typedef enum cpg_frqcra_stc cpg_frqcra_stc;
-enum cpg_frqcra_stc
-{
+typedef enum {
   PLL_MUL_12 = 0x05,
   PLL_MUL_16 = 0x07,
   PLL_MUL_24 = 0x0B,
@@ -15,11 +13,9 @@ enum cpg_frqcra_stc
   PLL_MUL_32 = 0x0F,
   PLL_MUL_36 = 0x11,
   PLL_MUL_48 = 0x17
-};
+} cpg_frqcra_stc;
 
-typedef enum cpg_frqcra_ifc cpg_frqcra_ifc;
-enum cpg_frqcra_ifc
-{
+typedef enum {
   IFC_DIV_2  = 0x0,
   IFC_DIV_3  = 0x1,
   IFC_DIV_4  = 0x2,
@@ -32,11 +28,9 @@ enum cpg_frqcra_ifc
   IFC_DIV_36 = 0xA,
   IFC_DIV_48 = 0xB,
   IFC_DIV_72 = 0xD
-};
+} cpg_frqcra_ifc;
 
-typedef enum cpg_frqcra_sfc cpg_frqcra_sfc;
-enum cpg_frqcra_sfc
-{
+typedef enum {
   SFC_DIV_4  = 0x2,
   SFC_DIV_6  = 0x3,
   SFC_DIV_8  = 0x4,
@@ -47,11 +41,9 @@ enum cpg_frqcra_sfc
   SFC_DIV_36 = 0xA,
   SFC_DIV_48 = 0xB,
   SFC_DIV_72 = 0xD
-};
+} cpg_frqcra_sfc;
 
-typedef enum cpg_frqcra_bfc cpg_frqcra_bfc;
-enum cpg_frqcra_bfc
-{
+typedef enum {
   BFC_DIV_4  = 0x2,
   BFC_DIV_6  = 0x3,
   BFC_DIV_8  = 0x4,
@@ -62,11 +54,9 @@ enum cpg_frqcra_bfc
   BFC_DIV_36 = 0xA,
   BFC_DIV_48 = 0xB,
   BFC_DIV_72 = 0xD
-};
+} cpg_frqcra_bfc;
 
-typedef enum cpg_frqcra_p1fc cpg_frqcra_p1fc;
-enum cpg_frqcra_p1fc
-{
+typedef enum {
   P1FC_DIV_4  = 0x2,
   P1FC_DIV_6  = 0x3,
   P1FC_DIV_8  = 0x4,
@@ -77,12 +67,10 @@ enum cpg_frqcra_p1fc
   P1FC_DIV_36 = 0xA,
   P1FC_DIV_48 = 0xB,
   P1FC_DIV_72 = 0xD
-};
+} cpg_frqcra_p1fc;
 
 // Frequency control register A
-typedef union cpg_frqcra cpg_frqcra;
-union cpg_frqcra
-{
+typedef union {
   struct
   {
     uint32_t KICK        : 1;
@@ -97,12 +85,10 @@ union cpg_frqcra
   };
 
   uint32_t raw;
-};
+} cpg_frqcra;
 
 // Frequency change status register
-typedef union cpg_lstatus cpg_lstatus;
-union cpg_lstatus
-{
+typedef union {
   struct
   {
     uint32_t _reserved0 : 31;
@@ -110,7 +96,7 @@ union cpg_lstatus
   };
 
   uint32_t raw;
-};
+} cpg_lstatus;
 
 #define CPG_FRQCRA          ((volatile cpg_frqcra *) 0xA4150000)
 #define CPG_LSTATUS         ((volatile cpg_lstatus *)0xA4150060)
