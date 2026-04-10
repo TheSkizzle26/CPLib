@@ -35,32 +35,17 @@ void render() {
     cpBeginDrawing();
     cpClearBackground(BLACK);
 
-    cpDrawLine(
-        0, 0,
-        100, 100,
-        RED
-    );
-
-    cpDrawRectangle(
-        tick,
-        250,
-        100,
-        50,
-        SKYBLUE
-    );
-
-    cpDrawLine(
-        0, 0,
-        tick, 0,
-        WHITE
-    );
+    cpDrawLine(0, 0, 100, 100, RED);
+    cpDrawRectangle(tick, 250, 100, 50, SKYBLUE);
+    cpDrawLine(0, 0, tick, 0, WHITE);
+    cpDrawCircle(150, 100, 30, WHITE);
 
     cpEndDrawing();
 }
 
 int main() {
     cpInit();
-    cpSetTargetFPS(5);
+    cpSetTargetFPS(60);
     cpSetOverclock(OC_MUL_48);
 
     is_running = true;

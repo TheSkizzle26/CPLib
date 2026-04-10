@@ -131,9 +131,10 @@ void cpBeginDrawing();
 void cpEndDrawing();
 
 void cpClearBackground(cpColor tint);
-void cpDrawPixel(int x, int y, cpColor tint);
-void cpDrawLine(int x1, int y1, int x2, int y2, cpColor tint);
+void cpDrawPixel(int x, int y, cpColor tint); // no clipping
+void cpDrawLine(int x1, int y1, int x2, int y2, cpColor tint); // no clipping (for now)
 void cpDrawRectangle(int x, int y, int w, int h, cpColor tint);
+void cpDrawCircle(int centerX, int centerY, int radius, cpColor tint);
 
 bool cpIsKeyDown(cpKeyIndices keyIdx);
 bool cpIsKeyPressed(cpKeyIndices keyIdx);

@@ -280,13 +280,13 @@ inline void cpClearBackground(const cpColor tint) {
     memset(pixelBuf, tint, (int)sizeof(uint16_t) * numPixels);
 }
 
-// TODO: add bounds checking, improve performance using dmac (i think thats what it's called)
-
+// DOESN'T HAVE CLIPPING!!! (for performance reasons)
 inline void cpDrawPixel(const int x, const int y, const cpColor tint) {
     pixelBuf[y*screenWidth + x] = tint;
 }
 
 inline void cpDrawLine(int x1, int y1, int x2, int y2, cpColor tint) {
+    // TODO: add clipping
     // bresenham line algorithm, based on https://saturncloud.io/blog/bresenham-line-algorithm-a-powerful-tool-for-efficient-line-drawing/
     int dx = x2 - x1; if (dx < 0) dx *= -1;
     int dy = y2 - y1; if (dy < 0) dy *= -1;
@@ -339,10 +339,56 @@ inline void cpDrawLine(int x1, int y1, int x2, int y2, cpColor tint) {
     }
 }
 
-void cpDrawRectangle(const int x, const int y, const int w, const int h, const cpColor tint) {
+void cpDrawRectangle(int x, int y, int w, int h, cpColor tint) {
+    // clipping
+    if (x < 0) x = 0;
+    if (y < 0) y = 0;
+    if (x+w >= screenWidth) w = screenWidth-x;
+    if (y+h >= screenHeight) h = screenHeight-y;
+
     for (int sy = y; sy < y+h; sy++) {
         for (int sx = x; sx < x+w; sx++) {
             cpDrawPixel(sx, sy, tint);
+        }
+    }
+}
+
+void cpDrawCircle(int centerX, int centerY, int radius, cpColor tint) {
+    // TODO: optimize clipping maybe?
+    // based off: https://stackoverflow.com/questions/1201200/fast-algorithm-for-drawing-filled-circles
+    int x = radius;
+    int y = 0;
+    int xChange = 1 - (radius << 1);
+    int yChange = 0;
+    int radiusError = 0;
+
+    while (x >= y) {
+        for (int i = centerX - x; i <= centerX + x; i++) {
+            if (i < 0 || i >= screenWidth) continue;
+
+            if (centerY + y >= 0 && centerY + y < screenHeight)
+                cpDrawPixel(i, centerY + y, tint);
+            if (centerY - y >= 0 && centerY - y < screenHeight)
+                cpDrawPixel(i, centerY - y, tint);
+        }
+
+        for (int i = centerX - y; i <= centerX + y; i++) {
+            if (i < 0 || i >= screenWidth) continue;
+
+            if (centerY + x >= 0 && centerY + x < screenHeight)
+                cpDrawPixel(i, centerY + x, tint);
+            if (centerY - x >= 0 && centerY - x < screenHeight)
+                cpDrawPixel(i, centerY - x, tint);
+        }
+
+        y++;
+        radiusError += yChange;
+        yChange += 2;
+
+        if ((radiusError << 1) + xChange > 0) {
+            x--;
+            radiusError += xChange;
+            xChange += 2;
         }
     }
 }
