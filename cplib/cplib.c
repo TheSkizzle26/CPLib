@@ -145,6 +145,7 @@ void cpInit() {
     numPixels = screenWidth * screenHeight;
     rlwInitWindow(screenWidth, screenHeight, "CPLib emu");
 
+    // create raylib stuff
     rlTexture = rlwCreateTexture(screenWidth, screenHeight);
     rlPixelBuf = (uint8_t*)malloc(sizeof(uint8_t) * 4*numPixels);
     memset(rlPixelBuf, 0, (int)sizeof(uint8_t) * 4*numPixels);
@@ -249,6 +250,7 @@ void cpEndDrawing() {
         rlPixelBuf[i*4+3] = 255;
     }
 
+    // render raylib texture
     rlwUpdateTexture(rlTexture, rlPixelBuf);
     rlwDrawTexture(rlTexture);
     rlwEndDrawing();
@@ -258,6 +260,7 @@ void cpEndDrawing() {
         keyState[i] = rlwIsKeyDown(keyCodes[i]);
     }
 #else
+    // draw pixel buffer
     memcpy(calcVRAM, pixelBuf, (int)sizeof(uint16_t) * numPixels);
     CALC_LCD_Refresh();
 
@@ -271,7 +274,7 @@ void cpEndDrawing() {
         keyState[i] = !!((i < 10 ? key1 : key2) & keycode);
     }
 
-    // wait till we reach out target fps
+    // wait till we reach our target fps
     cmt_wait();
 #endif
 }
@@ -393,18 +396,18 @@ void cpDrawCircle(int centerX, int centerY, int radius, cpColor tint) {
     }
 }
 
-bool cpIsKeyDown(const cpKeyIndices keyIdx) {
+inline bool cpIsKeyDown(const cpKeyIndices keyIdx) {
     return keyState[keyIdx];
 }
 
-bool cpIsKeyPressed(const cpKeyIndices keyIdx) {
+inline bool cpIsKeyPressed(const cpKeyIndices keyIdx) {
     return keyState[keyIdx] && !lastKeyState[keyIdx];
 }
 
-bool cpIsKeyUp(const cpKeyIndices keyIdx) {
+inline bool cpIsKeyUp(const cpKeyIndices keyIdx) {
     return !keyState[keyIdx];
 }
 
-bool cpIsKeyReleased(const cpKeyIndices keyIdx) {
+inline bool cpIsKeyReleased(const cpKeyIndices keyIdx) {
     return !keyState[keyIdx] && lastKeyState[keyIdx];
 }
