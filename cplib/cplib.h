@@ -10,6 +10,8 @@
 
 
 #ifdef TARGET_PC
+#include <stdlib.h>
+#include <string.h>
 #define HOLLYHOCK_SECTION_STRING(name, str)
 #define APP_NAME(app_name)
 #define APP_DESCRIPTION(app_description)
@@ -27,6 +29,14 @@ HOLLYHOCK_SECTION_STRING(description, app_description)
 HOLLYHOCK_SECTION_STRING(author, app_author)
 #define APP_VERSION(app_version) \
 HOLLYHOCK_SECTION_STRING(version, app_version)
+#endif
+
+
+#ifndef TARGET_PC
+void free(void *ptr);
+void* malloc(uint32_t size);
+void* memcpy(void *destination, const void *source, int num);
+void* memset(void *ptr, int value, int num);
 #endif
 
 
@@ -113,6 +123,18 @@ typedef enum {
 } cpKeyIndices;
 
 
+typedef enum {
+    CP_PIXEL_FORMAT_RGB565 = 0, // RGB565 -> 2 bytes
+    CP_PIXEL_FORMAT_RGB565_A8 = 1 // RGB565 + 1 byte alpha (bool) -> 3 bytes
+} cpPixelFormat;
+
+typedef struct {
+    int width, height;
+    cpPixelFormat pixelFormat;
+    uint8_t* data;
+} cpTexture;
+
+
 void cpInit();
 void cpQuit();
 
@@ -121,8 +143,8 @@ void cpSetOverclock(cpOverclockMultipliers mul);
 
 cpColor cpRGBtoColor(uint8_t r, uint8_t g, uint8_t b);
 
-uint cpGetScreenWidth();
-uint cpGetScreenHeight();
+int cpGetScreenWidth();
+int cpGetScreenHeight();
 uint16_t* cpGetFramebuffer();
 
 void cpBeginDrawing();
@@ -133,6 +155,7 @@ void cpDrawPixel(int x, int y, cpColor tint); // no clipping
 void cpDrawLine(int x1, int y1, int x2, int y2, cpColor tint); // no clipping (for now)
 void cpDrawRectangle(int x, int y, int w, int h, cpColor tint);
 void cpDrawCircle(int centerX, int centerY, int radius, cpColor tint);
+void cpDrawTexture(cpTexture texture, int x, int y); // no tint for you sir
 
 bool cpIsKeyDown(cpKeyIndices keyIdx);
 bool cpIsKeyPressed(cpKeyIndices keyIdx);

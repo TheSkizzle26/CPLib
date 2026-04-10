@@ -14,6 +14,8 @@
 #include <stdbool.h>
 
 #ifdef TARGET_PC
+#include <stdlib.h>
+#include <string.h>
 #include "raylib_wrapper.h"
 #else
 #include "cpg.h"
@@ -32,15 +34,6 @@ void CALC_LCD_SetPixelFromPalette(int x, int y, uint8_t index);
 void CALC_LCD_VRAMBackup();
 void CALC_LCD_VRAMRestore();
 
-#ifdef TARGET_PC
-#include <stdlib.h>
-#include <string.h>
-#else
-void free(void *ptr);
-void* malloc(uint32_t size);
-void* memcpy(void *destination, const void *source, int num);
-void* memset(void *ptr, int value, int num);
-#endif
 
 // keys
 #define NUM_KEYS 34
@@ -211,11 +204,11 @@ inline cpColor cpRGBtoColor(const uint8_t r, const uint8_t g, const uint8_t b) {
     return ((r & 0b11111000) << 8) | ((g & 0b11111100) << 3) | (b >> 3);
 }
 
-inline uint cpGetScreenWidth() {
+inline int cpGetScreenWidth() {
     return screenWidth;
 }
 
-inline uint cpGetScreenHeight() {
+inline int cpGetScreenHeight() {
     return screenHeight;
 }
 
@@ -393,6 +386,44 @@ void cpDrawCircle(int centerX, int centerY, int radius, cpColor tint) {
             radiusError += xChange;
             xChange += 2;
         }
+    }
+}
+
+void cpDrawTexture_RGB565(const cpTexture texture, const int x, const int y) {
+    const int tw = x + texture.width >= screenWidth ? screenWidth - x : texture.width;
+    const int th = y + texture.height >= screenHeight ? screenHeight - y : texture.height;
+
+    for (int ty = y < 0 ? -y : 0; ty < th; ty++) {
+        for (int tx = x < 0 ? -x : 0; tx < tw; tx++) {
+            const uint32_t i = (ty * texture.width) + tx;
+            const uint16_t color = ((uint16_t*)texture.data)[i];
+            cpDrawPixel(x + tx, y + ty, color);
+        }
+    }
+}
+
+void cpDrawTexture_RGB565_A8(const cpTexture texture, const int x, const int y) {
+    const int tw = x + texture.width >= screenWidth ? screenWidth - x : texture.width;
+    const int th = y + texture.height >= screenHeight ? screenHeight - y : texture.height;
+
+    for (int ty = y < 0 ? -y : 0; ty < th; ty++) {
+        for (int tx = x < 0 ? -x : 0; tx < tw; tx++) {
+            const uint32_t i = (ty * texture.width) + tx;
+            const uint16_t color = *(uint16_t*)(texture.data + i*3);
+            const bool alpha = *(bool*)(texture.data + i*3 + 2);
+            if (alpha) cpDrawPixel(x + tx, y + ty, color);
+        }
+    }
+}
+
+void cpDrawTexture(const cpTexture texture, const int x, const int y) {
+    switch (texture.pixelFormat) {
+        case CP_PIXEL_FORMAT_RGB565:
+            cpDrawTexture_RGB565(texture, x, y);
+            break;
+        case CP_PIXEL_FORMAT_RGB565_A8:
+            cpDrawTexture_RGB565_A8(texture, x, y);
+            break;
     }
 }
 

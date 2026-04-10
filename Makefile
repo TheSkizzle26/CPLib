@@ -34,7 +34,7 @@ CXX:=sh4-elf-g++
 CXX_FLAGS:=-ffreestanding -fno-exceptions -fno-rtti -fshort-wchar -Wall -Wextra -O2
 
 LD:=sh4-elf-gcc
-LD_FLAGS:=-nostartfiles -nostdlib
+LD_FLAGS:=-nostartfiles -nostdlib -lgcc
 
 READELF:=sh4-elf-readelf
 OBJCOPY:=sh4-elf-objcopy
