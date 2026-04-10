@@ -10,7 +10,7 @@
  */
 
 
-#include "cplib.h"
+#include "cplib/cplib.h"
 
 APP_NAME("CPLib test")
 APP_DESCRIPTION("CPLib test program")
