@@ -125,6 +125,8 @@ typedef enum {
 
 void rlwInitWindow(int width, int height, char* title);
 void rlwCloseWindow();
+void rlwSetWindowTitle(char* title);
+int rlwGetFPS();
 void rlwSetTargetFPS(int value);
 void rlwBeginDrawing();
 void rlwEndDrawing();

@@ -6,32 +6,40 @@
 #include <string.h>
 
 
-void rlwInitWindow(int width, int height, char* title) {
+inline void rlwInitWindow(int width, int height, char* title) {
     InitWindow(width, height, title);
     SetWindowMonitor(0);
 }
 
-void rlwCloseWindow() {
+inline void rlwCloseWindow() {
     CloseWindow();
 }
 
-void rlwSetTargetFPS(int value) {
+inline void rlwSetWindowTitle(char* title) {
+    SetWindowTitle(title);
+}
+
+inline int rlwGetFPS() {
+    return GetFPS();
+}
+
+inline void rlwSetTargetFPS(int value) {
     SetTargetFPS(value);
 }
 
-void rlwBeginDrawing() {
+inline void rlwBeginDrawing() {
     BeginDrawing();
 }
 
-void rlwEndDrawing() {
+inline void rlwEndDrawing() {
     EndDrawing();
 }
 
-int rlwGetTextureWidth(void* texture) {
+inline int rlwGetTextureWidth(void* texture) {
     return ((Texture*)texture)->width;
 }
 
-int rlwGetTextureHeight(void* texture) {
+inline int rlwGetTextureHeight(void* texture) {
     return ((Texture*)texture)->height;
 }
 
@@ -43,12 +51,12 @@ void* rlwCreateTexture(int width, int height) {
     return t;
 }
 
-void rlwUpdateTexture(void* texture, uint8_t* data) {
+inline void rlwUpdateTexture(void* texture, uint8_t* data) {
     Texture* t = (Texture*)texture;
     UpdateTexture(*t, data);
 }
 
-void rlwDrawTexture(void* texture) {
+inline void rlwDrawTexture(void* texture) {
     DrawTexture(
         *(Texture*)texture,
         0, 0,
@@ -56,7 +64,7 @@ void rlwDrawTexture(void* texture) {
     );
 }
 
-bool rlwIsKeyDown(uint32_t keycode) {
+inline bool rlwIsKeyDown(uint32_t keycode) {
     return IsKeyDown(keycode);
 }
 

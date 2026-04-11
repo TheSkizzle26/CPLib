@@ -253,8 +253,27 @@ void cpEndDrawing() {
         keyState[i] = rlwIsKeyDown(keyCodes[i]);
     }
 
-    // set window title
+    // set window title (no stdlib)
+    char title[32] = "CPLib emu | FPS: ";
 
+    size_t numDigits = 0;
+    int fps = rlwGetFPS();
+    int temp = fps;
+    while (temp) {
+        numDigits++;
+        temp /= 10;
+    }
+
+    temp = fps;
+    size_t endIdx = 17 + numDigits;
+    size_t charIdx = endIdx - 1;
+    while (temp) {
+        title[charIdx--] = '0' + (temp % 10);
+        temp /= 10;
+    }
+
+    title[endIdx] = 0;
+    rlwSetWindowTitle(title);
 #else
     // draw pixel buffer
     memcpy(calcVRAM, pixelBuf, (int)sizeof(uint16_t) * numPixels);
