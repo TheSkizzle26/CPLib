@@ -5,6 +5,7 @@
 #ifndef CPLIB_CPLIB_H
 #define CPLIB_CPLIB_H
 
+#include <stddef.h>
 #include <stdint.h>
 #include <stdbool.h>
 
@@ -33,14 +34,13 @@ HOLLYHOCK_SECTION_STRING(version, app_version)
 
 
 #ifndef TARGET_PC
-void free(void *ptr);
-void* malloc(uint32_t size);
-void* memcpy(void *destination, const void *source, int num);
-void* memset(void *ptr, int value, int num);
+void free(void* ptr);
+void* malloc(size_t size);
+void* memcpy(void* destination, const void* source, size_t num);
+void* memset(void* ptr, int value, size_t num);
 #endif
 
 
-typedef uint32_t uint;
 typedef uint16_t cpColor;
 
 // literally just raylib's colors
@@ -70,7 +70,6 @@ typedef uint16_t cpColor;
 #define BLANK 0
 #define MAGENTA 63519
 #define RAYWHITE 63422
-
 
 typedef enum {
     OC_MUL_12 = 0x05,
@@ -131,7 +130,7 @@ typedef enum {
 typedef struct {
     int width, height;
     cpPixelFormat pixelFormat;
-    uint8_t* data;
+    void* data;
 } cpTexture;
 
 

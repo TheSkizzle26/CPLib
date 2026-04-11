@@ -252,6 +252,9 @@ void cpEndDrawing() {
     for (int i = 0; i < NUM_KEYS; i++) {
         keyState[i] = rlwIsKeyDown(keyCodes[i]);
     }
+
+    // set window title
+
 #else
     // draw pixel buffer
     memcpy(calcVRAM, pixelBuf, (int)sizeof(uint16_t) * numPixels);
