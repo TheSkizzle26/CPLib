@@ -303,7 +303,7 @@ inline void cpDrawPixel(const int x, const int y, const cpColor tint) {
     pixelBuf[y*screenWidth + x] = tint;
 }
 
-inline void cpDrawLine(int x1, int y1, int x2, int y2, cpColor tint) {
+void cpDrawLine(int x1, int y1, int x2, int y2, cpColor tint) {
     // TODO: add clipping
     // bresenham line algorithm, based on https://saturncloud.io/blog/bresenham-line-algorithm-a-powerful-tool-for-efficient-line-drawing/
     int dx = x2 - x1; if (dx < 0) dx *= -1;
