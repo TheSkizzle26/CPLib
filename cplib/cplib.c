@@ -114,6 +114,7 @@ static uint32_t keyCodes[NUM_KEYS] = {
 static int screenWidth, screenHeight;
 static int numPixels;
 static cpColor* pixelBuf __attribute__((aligned(32))); // faster memcpy
+static bool fpsUnlocked;
 
 static bool keyState[NUM_KEYS];
 static bool lastKeyState[NUM_KEYS];
@@ -152,12 +153,11 @@ void cpInit() {
     calcVRAM = CALC_LCD_GetVRAMAddress();
     CALC_LCD_VRAMBackup();
 
-    // init timers
-    POWER_MSTPCR0->CMT = 0;
 #endif
 
     pixelBuf = (cpColor*)malloc(sizeof(cpColor) * numPixels);
     memset(pixelBuf, 0, (int)sizeof(cpColor) * numPixels);
+
     cpSetTargetFPS(0);
 
     fixHalfScreenWidth = fix16_from_int(screenWidth / 2);
@@ -182,7 +182,7 @@ void cpQuit() {
 
     // stop timers
     cmt_stop();
-    POWER_MSTPCR0->CMT = 0;
+    POWER_MSTPCR0->CMT = 1;
 #endif
 
     free(pixelBuf);
@@ -193,10 +193,13 @@ void cpSetTargetFPS(const int value) {
     rlwSetTargetFPS(value);
 #else
     if (value <= 0) {
-        // infinite
-        cmt_stop();
+        // fps unlocked
+        POWER_MSTPCR0->CMT = 1; // disable timer
+        fpsUnlocked = true;
     } else {
+        POWER_MSTPCR0->CMT = 0; // enable timer
         cmt_set(CMT_TICKS_PER_SEC / value, CMT_MODE_ONE_SHOT, CMT_REQUEST_DISABLE);
+        fpsUnlocked = false;
     }
 #endif
 }
@@ -231,7 +234,8 @@ inline void cpBeginDrawing() {
     rlwBeginDrawing();
 #else
     // start frame timer
-    cmt_start();
+    if (!fpsUnlocked)
+        cmt_start();
 #endif
 }
 
@@ -300,12 +304,14 @@ void cpEndDrawing() {
     }
 
     // wait till we reach our target fps
-    cmt_wait();
+    if (!fpsUnlocked)
+        cmt_wait();
 #endif
 }
 
 inline void cpClearBackground(const cpColor tint) {
-    memset(pixelBuf, tint, (int)sizeof(uint16_t) * numPixels);
+    for (size_t i = 0; i < numPixels; i++)
+        pixelBuf[i] = tint;
 }
 
 // DOESN'T HAVE CLIPPING!!! (for performance reasons)
@@ -506,10 +512,14 @@ void cpDrawMesh(const cpMesh mesh, const cpVector3 offset, const cpColor tint) {
         if (start.z < fixEps && end.z < fixEps)
             continue;
 
-        if (start.z < fixEps)
+        if (start.z < fixEps) {
             clipBehindCamera(&start, end);
-        if (end.z < fixEps)
+            start.z = fixEps;
+        }
+        else if (end.z < fixEps) {
             clipBehindCamera(&end, start);
+            end.z = fixEps;
+        }
 
         // screen space
         const cpVector2 screenCoordStart = cpCameraToScreenSpace(start);
@@ -548,10 +558,14 @@ void cpDrawLine3d(const cpVector3 start, const cpVector3 end, const cpColor tint
     if (camStart.z < fixEps && camEnd.z < fixEps)
         return;
 
-    if (camStart.z < fixEps)
+    if (camStart.z < fixEps) {
         clipBehindCamera(&camStart, camEnd);
-    if (camEnd.z < fixEps)
+        camStart.z = fixEps;
+    }
+    else if (camEnd.z < fixEps) {
         clipBehindCamera(&camEnd, camStart);
+        camEnd.z = fixEps;
+    }
 
     // screen space
     const cpVector2 screenCoordStart = cpCameraToScreenSpace(camStart);

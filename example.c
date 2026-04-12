@@ -73,7 +73,7 @@ void init() {
         {
             fix16_from_int(0),
             fix16_from_int(0),
-            fix16_from_int(-10),
+            fix16_from_int(-3),
         },
         0,
         0
