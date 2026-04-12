@@ -113,10 +113,17 @@ static uint32_t keyCodes[NUM_KEYS] = {
 
 static int screenWidth, screenHeight;
 static int numPixels;
-static cpColor* pixelBuf __attribute__((aligned(32)));
+static cpColor* pixelBuf __attribute__((aligned(32))); // faster memcpy
 
 static bool keyState[NUM_KEYS];
 static bool lastKeyState[NUM_KEYS];
+
+static cpCamera3d camera3d;
+
+// some constants for 3d rendering
+static fix16_t fixHalfScreenWidth;
+static fix16_t fixHalfScreenHeight;
+static fix16_t fixNegHalfScreenHeight;
 
 #ifdef TARGET_PC
 static void* rlTexture;
@@ -150,8 +157,11 @@ void cpInit() {
 
     pixelBuf = (cpColor*)malloc(sizeof(cpColor) * numPixels);
     memset(pixelBuf, 0, (int)sizeof(cpColor) * numPixels);
-
     cpSetTargetFPS(0);
+
+    fixHalfScreenWidth = fix16_from_int(screenWidth / 2);
+    fixHalfScreenHeight = fix16_from_int(screenHeight / 2);
+    fixNegHalfScreenHeight = fix16_from_int(-screenHeight / 2);
 }
 
 void cpQuit() {
@@ -443,6 +453,56 @@ void cpDrawTexture(const cpTexture texture, const int x, const int y) {
             break;
     }
 }
+
+void cpRegisterCamera3d(const cpCamera3d camera) {
+    memcpy(&camera3d, &camera, sizeof(cpCamera3d));
+}
+
+cpVector3 cpWorldToCameraSpace(const cpVector3 pos) {
+    return cpVector3Subtract(pos, camera3d.pos);
+}
+
+cpVector3 cpCameraToScreenSpace(const cpVector3 pos) {
+    return (cpVector3) {
+        fix16_add(fix16_mul(fix16_div(pos.x, pos.z), fixHalfScreenWidth), fixHalfScreenWidth),
+        fix16_add(fix16_mul(fix16_div(pos.y, pos.z), fixNegHalfScreenHeight), fixHalfScreenHeight),
+        0 // z unused
+    };
+}
+
+void cpDrawMesh(const cpMesh mesh, const cpVector3 offset, const cpColor tint) {
+    cpVector3* screenCoords = malloc(sizeof(cpVector3) * mesh.vertexCount);
+
+    for (size_t i = 0; i < mesh.vertexCount; i++) {
+        screenCoords[i] = cpCameraToScreenSpace(
+            cpWorldToCameraSpace(
+                cpVector3Add(mesh.vertices[i], offset)
+            )
+        );
+    }
+
+    for (size_t i = 0; i < mesh.edgeCount; i++) {
+        const cpMeshEdge edge = mesh.edges[i];
+        cpDrawLine(
+            fix16_to_int(screenCoords[edge.a].x),
+            fix16_to_int(screenCoords[edge.a].y),
+            fix16_to_int(screenCoords[edge.b].x),
+            fix16_to_int(screenCoords[edge.b].y),
+            tint
+        );
+    }
+
+    free(screenCoords);
+}
+
+void cpDrawPixel3d(const cpVector3 pos, const cpColor tint) {
+
+}
+
+void cpDrawLine3d(const cpVector3 a, const cpVector3 b, const cpColor tint) {
+
+}
+
 
 inline bool cpIsKeyDown(const cpKeyIndices keyIdx) {
     return keyState[keyIdx];

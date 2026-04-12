@@ -131,15 +131,19 @@ typedef struct {
 } cpTexture;
 
 typedef struct {
+    cpVector3 pos;
+    fix16_t yaw, pitch;
+} cpCamera3d;
+
+typedef struct {
     size_t a, b;
 } cpMeshEdge;
 
 typedef struct {
     size_t vertexCount; // vertices
-    cpVector3i* vertices;
+    cpVector3* vertices;
     size_t edgeCount; // edges
     cpMeshEdge* edges;
-    cpColor color; // color
 } cpMesh;
 
 
@@ -155,10 +159,13 @@ int cpGetScreenWidth();
 int cpGetScreenHeight();
 uint16_t* cpGetFramebuffer();
 
+// collision detection functions
+void cpCheckCollisionLines();
+
+// 2d drawing functions
 void cpBeginDrawing();
 void cpEndDrawing();
 
-// 2d drawing functions
 void cpClearBackground(cpColor tint);
 void cpDrawPixel(int x, int y, cpColor tint); // no clipping
 void cpDrawLine(int x1, int y1, int x2, int y2, cpColor tint); // no clipping (for now)
@@ -167,8 +174,15 @@ void cpDrawCircle(int centerX, int centerY, int radius, cpColor tint);
 void cpDrawTexture(cpTexture texture, int x, int y); // no tint for you sir
 
 // 3d drawing functions
-void cpDrawMesh();
+void cpRegisterCamera3d(cpCamera3d camera);
+cpVector3 cpWorldToCameraSpace(cpVector3 pos);
+cpVector3 cpCameraToScreenSpace(cpVector3 pos); // TODO: use vec2 once added
 
+void cpDrawMesh(cpMesh mesh, cpVector3 offset, cpColor tint);
+void cpDrawPixel3d(cpVector3 pos, cpColor tint); // not yet implemented
+void cpDrawLine3d(cpVector3 a, cpVector3 b, cpColor tint); // not yet implemented
+
+// input functions
 bool cpIsKeyDown(cpKeyIndices keyIdx);
 bool cpIsKeyPressed(cpKeyIndices keyIdx);
 bool cpIsKeyUp(cpKeyIndices keyIdx);

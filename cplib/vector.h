@@ -40,7 +40,7 @@ cpVector2 cpVector2Negate(cpVector2 v); // uses software floats!
 fix16_t cpVector2Length(cpVector2 v); // uses software floats!
 fix16_t cpVector2Distance(cpVector2 a, cpVector2 b); // uses software floats!
 fix16_t cpVector2DotProduct(cpVector2 a, cpVector2 b); // uses software floats!
-cpVector2 cpVector2CrossProduct(cpVector2 a, cpVector2 b); // uses software floats!
+fix16_t cpVector2CrossProduct(cpVector2 a, cpVector2 b); // uses software floats!
 cpVector2 cpVector2Normalize(cpVector2 v); // uses software floats!
 
 cpVector2i cpVector2iAdd(cpVector2i a, cpVector2i b);

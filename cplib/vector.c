@@ -1,9 +1,8 @@
 #include "common.h"
 #include "vector.h"
 
-// TODO: replace with macros since we're just repeating the
-// TODO: same things over and over again
 // TODO: maybe make more functions inline
+
 
 #define F2_OP(op) return (cpVector2) { \
     fix16_##op(a.x, b.x), \
@@ -43,6 +42,121 @@
     (a.z) op (b), \
 };
 
+
+/* cpVector2 */
+
+cpVector2 cpVector2Add(const cpVector2 a, const cpVector2 b) {
+    F2_OP(add)
+}
+
+cpVector2 cpVector2AddValue(const cpVector2 a, const fix16_t b) {
+    F2_OP_VAL(add)
+}
+
+cpVector2 cpVector2Subtract(const cpVector2 a, const cpVector2 b) {
+    F2_OP(sub)
+}
+
+cpVector2 cpVector2SubtractValue(const cpVector2 a, const fix16_t b) {
+    F2_OP_VAL(sub)
+}
+
+cpVector2 cpVector2Multiply(const cpVector2 a, const cpVector2 b) {
+    F2_OP(mul)
+}
+
+cpVector2 cpVector2MultiplyValue(const cpVector2 a, const fix16_t b) {
+    F2_OP_VAL(mul)
+}
+
+cpVector2 cpVector2Divide(const cpVector2 a, const cpVector2 b) {
+    F2_OP(div)
+}
+
+cpVector2 cpVector2DivideValue(const cpVector2 a, const fix16_t b) {
+    F2_OP_VAL(div)
+}
+
+inline cpVector2 cpVector2Negate(const cpVector2 v) {
+    return cpVector2MultiplyValue(v, fix16_from_int(-1));
+}
+
+fix16_t cpVector2Length(const cpVector2 v) {
+    return fix16_sqrt(
+        fix16_add(
+            fix16_mul(v.x, v.x),
+            fix16_mul(v.y, v.y)
+        )
+    );
+}
+
+fix16_t cpVector2Distance(const cpVector2 a, const cpVector2 b) {
+    const cpVector2 d = cpVector2Subtract(a, b);
+    return cpVector2Length(d);
+}
+
+fix16_t cpVector2DotProduct(const cpVector2 a, const cpVector2 b) {
+    return fix16_add(
+        fix16_mul(a.x, b.x),
+        fix16_mul(a.y, b.y)
+    );
+}
+
+fix16_t cpVector2CrossProduct(const cpVector2 a, const cpVector2 b) {
+    return fix16_sub(
+        fix16_mul(a.x, b.y),
+        fix16_mul(a.y, b.x)
+    );
+}
+
+cpVector2 cpVector2Normalize(const cpVector2 v) {
+    const fix16_t length = cpVector2Length(v);
+    return cpVector2DivideValue(
+        v,
+        length
+    );
+}
+
+/* cpVector2i */
+
+cpVector2i cpVector2iAdd(const cpVector2i a, const cpVector2i b) {
+    I2_OP(+)
+}
+
+cpVector2i cpVector2iAddValue(const cpVector2i a, const int b) {
+    I2_OP_VAL(+)
+}
+
+cpVector2i cpVector2iSubtract(const cpVector2i a, const cpVector2i b) {
+    I2_OP(-)
+}
+
+cpVector2i cpVector2iSubtractValue(const cpVector2i a, const int b) {
+    I2_OP_VAL(-)
+}
+
+cpVector2i cpVector2iMultiply(const cpVector2i a, const cpVector2i b) {
+    I2_OP(*)
+}
+
+cpVector2i cpVector2iMultiplyValue(const cpVector2i a, const int b) {
+    I2_OP_VAL(*)
+}
+
+cpVector2i cpVector2iDivide(const cpVector2i a, const cpVector2i b) {
+    I2_OP(/)
+}
+
+cpVector2i cpVector2iDivideValue(const cpVector2i a, const int b) {
+    I2_OP_VAL(/)
+}
+
+cpVector2i cpVector2iNegate(const cpVector2i v) {
+    return (cpVector2i) {
+        -v.x,
+        -v.y
+    };
+}
 
 /* cpVector3 */
 
@@ -96,16 +210,7 @@ fix16_t cpVector3Length(const cpVector3 v) {
 
 fix16_t cpVector3Distance(const cpVector3 a, const cpVector3 b) {
     const cpVector3 d = cpVector3Subtract(a, b);
-
-    return fix16_sqrt(
-    fix16_add(
-            fix16_mul(d.x, d.x),
-            fix16_add(
-                fix16_mul(d.y, d.y),
-                fix16_mul(d.z, d.z)
-            )
-        )
-    );
+    return cpVector3Length(d);
 }
 
 fix16_t cpVector3DotProduct(const cpVector3 a, const cpVector3 b) {

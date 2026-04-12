@@ -4,7 +4,8 @@ Functions very similar to RayLib.
 
 # Use
 Just copy the "cplib" folder into your project.\
-Also take a look at linker.ld, Makefile and of course example.c.
+Also take a look at linker.ld, Makefile and of course example.c.\
+The 3D rendering works a bit differently than raylib's. Just take a look at the 3d part in cplib/cplib.h.
 
 # Features:
 - very similar to raylib
