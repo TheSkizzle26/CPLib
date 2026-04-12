@@ -173,7 +173,7 @@ void cpDrawTexture(cpTexture texture, int x, int y); // no tint for you sir
 // 3d drawing functions
 void cpRegisterCamera3d(cpCamera3d camera);
 cpVector3 cpWorldToCameraSpace(cpVector3 pos);
-cpVector3 cpCameraToScreenSpace(cpVector3 pos); // TODO: use vec2 once added
+cpVector2 cpCameraToScreenSpace(cpVector3 pos); // TODO: use vec2 once added
 
 void cpDrawMesh(cpMesh mesh, cpVector3 offset, cpColor tint);
 void cpDrawPixel3d(cpVector3 pos, cpColor tint); // not yet implemented
