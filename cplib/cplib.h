@@ -5,9 +5,8 @@
 #ifndef CPLIB_CPLIB_H
 #define CPLIB_CPLIB_H
 
-#include <stddef.h>
-#include <stdint.h>
-#include <stdbool.h>
+#include "common.h"
+#include "vector.h"
 
 
 #ifdef TARGET_PC
@@ -40,8 +39,6 @@ void* memcpy(void* destination, const void* source, size_t num);
 void* memset(void* ptr, int value, size_t num);
 #endif
 
-
-typedef uint16_t cpColor;
 
 // literally just raylib's colors
 #define LIGHTGRAY 52825
@@ -133,6 +130,18 @@ typedef struct {
     void* data;
 } cpTexture;
 
+typedef struct {
+    size_t a, b;
+} cpMeshEdge;
+
+typedef struct {
+    size_t vertexCount; // vertices
+    cpVector3i* vertices;
+    size_t edgeCount; // edges
+    cpMeshEdge* edges;
+    cpColor color; // color
+} cpMesh;
+
 
 void cpInit();
 void cpQuit();
@@ -149,12 +158,16 @@ uint16_t* cpGetFramebuffer();
 void cpBeginDrawing();
 void cpEndDrawing();
 
+// 2d drawing functions
 void cpClearBackground(cpColor tint);
 void cpDrawPixel(int x, int y, cpColor tint); // no clipping
 void cpDrawLine(int x1, int y1, int x2, int y2, cpColor tint); // no clipping (for now)
 void cpDrawRectangle(int x, int y, int w, int h, cpColor tint);
 void cpDrawCircle(int centerX, int centerY, int radius, cpColor tint);
 void cpDrawTexture(cpTexture texture, int x, int y); // no tint for you sir
+
+// 3d drawing functions
+void cpDrawMesh();
 
 bool cpIsKeyDown(cpKeyIndices keyIdx);
 bool cpIsKeyPressed(cpKeyIndices keyIdx);

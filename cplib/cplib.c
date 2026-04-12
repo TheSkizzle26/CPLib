@@ -2,14 +2,9 @@
 // Created by timo on 09.04.26.
 //
 
-/*
- * TODO:
- * - add CALC_* prefix to cmt, power, etc.
- * - use dmac for rendering
- * - add clipping for rendering
- */
 
 #include "cplib.h"
+#include "common.h"
 #include <stdint.h>
 #include <stdbool.h>
 

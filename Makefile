@@ -20,21 +20,23 @@ APP_NAME:=cplib_test
 
 #If you use AS sources make sure to write the same functions in C++ because sh4 as does not run on the pc
 #The pc compiler
+FIXPOINT_DEFS := -DFIXMATH_NO_CACHE -DFIXMATH_NO_CTYPE -DFIXMATH_NO_HARD_DIVISION -DFIXMATH_FAST_SIN -DFIXMATH_NO_64BIT
+
 C_PC:=gcc
-C_PC_FLAGS:=-W -Wall -DTARGET_PC -lraylib
+C_PC_FLAGS:=-W -Wall -DTARGET_PC -lraylib $(FIXPOINT_DEFS)
 
 #The sh4 assembler, compiler and linker:
 AS:=sh4-elf-as
 AS_FLAGS:=
 
 CC:=sh4-elf-gcc
-CC_FLAGS:=-ffreestanding -fshort-wchar -Wall -Wextra -O2
+CC_FLAGS:=-ffreestanding -fshort-wchar -Wall -Wextra -O2 $(FIXPOINT_DEFS)
 
 CXX:=sh4-elf-g++
-CXX_FLAGS:=-ffreestanding -fno-exceptions -fno-rtti -fshort-wchar -Wall -Wextra -O2
+CXX_FLAGS:=-ffreestanding -fno-exceptions -fno-rtti -fshort-wchar -Wall -Wextra -O2 $(FIXPOINT_DEFS)
 
 LD:=sh4-elf-gcc
-LD_FLAGS:=-nostartfiles -nostdlib -lgcc
+LD_FLAGS:=-nostartfiles -nostdlib
 
 READELF:=sh4-elf-readelf
 OBJCOPY:=sh4-elf-objcopy
@@ -73,7 +75,7 @@ $(APP_ELF): $(OBJECTS) $(SDK_DIR)/sdk.o linker.ld
 # themselves. Just using the target to trigger an error when the file is
 # required but does not exist.
 # $(SDK_DIR)/sdk.o:
-# 	$(error You need to build the SDK before using it. Run make in the SDK directory, and check the README.md in the SDK directory for more information)
+# 	$(error You need to build the SDK before using it. Run make in the SDK directory, and check the README.md.md in the SDK directory for more information)
 
 %.o: %.s
 	$(AS) $< -o $@ $(AS_FLAGS)
