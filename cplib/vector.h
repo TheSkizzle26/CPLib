@@ -33,14 +33,14 @@ fix16_t cpVector3DotProduct(cpVector3 a, cpVector3 b); // uses software floats!
 cpVector3 cpVector3CrossProduct(cpVector3 a, cpVector3 b); // uses software floats!
 cpVector3 cpVector3Normalize(cpVector3 v); // uses software floats!
 
-cpVector3i cpVector3iAdd(cpVector3 a, cpVector3 b);
-cpVector3i cpVector3iAddValue(cpVector3 a, fix16_t b);
-cpVector3i cpVector3iSubtract(cpVector3 a, cpVector3 b);
-cpVector3i cpVector3iSubtractValue(cpVector3 a, fix16_t b);
-cpVector3i cpVector3iMultiply(cpVector3 a, cpVector3 b);
-cpVector3i cpVector3iMultiplyValue(cpVector3 a, fix16_t b);
-cpVector3i cpVector3iDivide(cpVector3 a, cpVector3 b);
-cpVector3i cpVector3iDivideValue(cpVector3 a, fix16_t b);
+cpVector3i cpVector3iAdd(cpVector3i a, cpVector3i b);
+cpVector3i cpVector3iAddValue(cpVector3i a, int b);
+cpVector3i cpVector3iSubtract(cpVector3i a, cpVector3i b);
+cpVector3i cpVector3iSubtractValue(cpVector3i a, int b);
+cpVector3i cpVector3iMultiply(cpVector3i a, cpVector3i b);
+cpVector3i cpVector3iMultiplyValue(cpVector3i a, int b);
+cpVector3i cpVector3iDivide(cpVector3i a, cpVector3i b);
+cpVector3i cpVector3iDivideValue(cpVector3i a, int b);
 
 cpVector3i cpVector3iNegate(cpVector3i v);
 
