@@ -71,7 +71,7 @@ cpVector3 cpVector3DivideValue(const cpVector3 a, const fix16_t b) {
     };
 }
 
-cpVector3 cpVector3Negate(cpVector3 v) {
+cpVector3 cpVector3Negate(const cpVector3 v) {
     return (cpVector3) {
         -v.x,
         -v.y,
@@ -79,7 +79,7 @@ cpVector3 cpVector3Negate(cpVector3 v) {
     };
 }
 
-fix16_t cpVector3Length(cpVector3 v) {
+fix16_t cpVector3Length(const cpVector3 v) {
     return fix16_sqrt(
     fix16_add(
             fix16_mul(v.x, v.x),
@@ -91,7 +91,7 @@ fix16_t cpVector3Length(cpVector3 v) {
     );
 }
 
-fix16_t cpVector3Distance(cpVector3 a, cpVector3 b) {
+fix16_t cpVector3Distance(const cpVector3 a, const cpVector3 b) {
     const cpVector3 d = cpVector3Subtract(a, b);
 
     return fix16_sqrt(
@@ -105,7 +105,7 @@ fix16_t cpVector3Distance(cpVector3 a, cpVector3 b) {
     );
 }
 
-fix16_t cpVector3DotProduct(cpVector3 a, cpVector3 b) {
+fix16_t cpVector3DotProduct(const cpVector3 a, const cpVector3 b) {
     return fix16_add(
         fix16_mul(a.x, b.x),
         fix16_add(
@@ -115,7 +115,7 @@ fix16_t cpVector3DotProduct(cpVector3 a, cpVector3 b) {
     );
 }
 
-cpVector3 cpVector3CrossProduct(cpVector3 a, cpVector3 b) {
+cpVector3 cpVector3CrossProduct(const cpVector3 a, const cpVector3 b) {
     return (cpVector3) {
         fix16_sub(
             fix16_mul(a.y, b.z),
@@ -132,7 +132,7 @@ cpVector3 cpVector3CrossProduct(cpVector3 a, cpVector3 b) {
     };
 }
 
-cpVector3 cpVector3Normalize(cpVector3 v) {
+cpVector3 cpVector3Normalize(const cpVector3 v) {
     const fix16_t length = cpVector3Length(v);
     return cpVector3DivideValue(
         v,
@@ -142,7 +142,7 @@ cpVector3 cpVector3Normalize(cpVector3 v) {
 
 /* cpVector3i */
 
-cpVector3i cpVector3iAdd(cpVector3i a, cpVector3i b) {
+cpVector3i cpVector3iAdd(const cpVector3i a, const cpVector3i b) {
     return (cpVector3i) {
         a.x + b.x,
         a.y + b.y,
@@ -150,7 +150,7 @@ cpVector3i cpVector3iAdd(cpVector3i a, cpVector3i b) {
     };
 }
 
-cpVector3i cpVector3iAddValue(cpVector3i a, int b) {
+cpVector3i cpVector3iAddValue(const cpVector3i a, const int b) {
     return (cpVector3i) {
         a.x + b,
         a.y + b,
@@ -158,7 +158,7 @@ cpVector3i cpVector3iAddValue(cpVector3i a, int b) {
     };
 }
 
-cpVector3i cpVector3iSubtract(cpVector3i a, cpVector3i b) {
+cpVector3i cpVector3iSubtract(const cpVector3i a, const cpVector3i b) {
     return (cpVector3i) {
         a.x - b.x,
         a.y - b.y,
@@ -166,7 +166,7 @@ cpVector3i cpVector3iSubtract(cpVector3i a, cpVector3i b) {
     };
 }
 
-cpVector3i cpVector3iSubtractValue(cpVector3i a, int b) {
+cpVector3i cpVector3iSubtractValue(const cpVector3i a, const int b) {
     return (cpVector3i) {
         a.x - b,
         a.y - b,
@@ -174,7 +174,7 @@ cpVector3i cpVector3iSubtractValue(cpVector3i a, int b) {
     };
 }
 
-cpVector3i cpVector3iMultiply(cpVector3i a, cpVector3i b) {
+cpVector3i cpVector3iMultiply(const cpVector3i a, const cpVector3i b) {
     return (cpVector3i) {
         a.x * b.x,
         a.y * b.y,
@@ -182,7 +182,7 @@ cpVector3i cpVector3iMultiply(cpVector3i a, cpVector3i b) {
     };
 }
 
-cpVector3i cpVector3iMultiplyValue(cpVector3i a, int b) {
+cpVector3i cpVector3iMultiplyValue(const cpVector3i a, const int b) {
     return (cpVector3i) {
         a.x * b,
         a.y * b,
@@ -190,7 +190,7 @@ cpVector3i cpVector3iMultiplyValue(cpVector3i a, int b) {
     };
 }
 
-cpVector3i cpVector3iDivide(cpVector3i a, cpVector3i b) {
+cpVector3i cpVector3iDivide(const cpVector3i a, const cpVector3i b) {
     return (cpVector3i) {
         a.x / b.x,
         a.y / b.y,
@@ -198,7 +198,7 @@ cpVector3i cpVector3iDivide(cpVector3i a, cpVector3i b) {
     };
 }
 
-cpVector3i cpVector3iDivideValue(cpVector3i a, int b) {
+cpVector3i cpVector3iDivideValue(const cpVector3i a, const int b) {
     return (cpVector3i) {
         a.x / b,
         a.y / b,
@@ -206,7 +206,7 @@ cpVector3i cpVector3iDivideValue(cpVector3i a, int b) {
     };
 }
 
-cpVector3i cpVector3iNegate(cpVector3i v) {
+cpVector3i cpVector3iNegate(const cpVector3i v) {
     return (cpVector3i) {
         -v.x,
         -v.y,
