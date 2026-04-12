@@ -1,14 +1,20 @@
-TODOs:
-    - add CALC_* prefix to cmt, power, etc.
-    - use dmac for rendering
-    - add clipping for rendering
-    - add vector arithmatic for: cpVector3, cpVector3i
+# CPLib
+A library for drawing, input, etc. for the ClassPad II calculator.\
+Functions very similar to RayLib.
 
-Features:
-    - very similar to raylib
-    - 2d and 3d rendering
-    - shape drawing
-    - vector arithmetic
-    - try to use cpVector*i whenever possible,
-      as floats have to be software-emulated
-    - also includes libfixmath for float vectors
+# Use
+Just copy the "cplib" folder into your project.\
+Also take a look at linker.ld, Makefile and of course example.c.
+
+# Features:
+- very similar to raylib
+- 2d and (soon) 3d rendering
+- shape drawing
+- vector arithmetic
+- also includes libfixmath for float vectors
+- try to use cpVector*i whenever possible, as floats are to be software-emulated
+
+# TODOs:
+- add CALC_* prefix to cmt, power, etc.
+- use dmac for rendering
+- add clipping for some rendering functions
