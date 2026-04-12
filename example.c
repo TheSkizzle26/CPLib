@@ -44,7 +44,7 @@ void init() {
 }
 
 void update() {
-    if (cpIsKeyPressed(KEY_CLEAR)) {
+    if (cpIsKeyPressed(CP_KEY_CLEAR)) {
         isRunning = false;
     }
 
@@ -87,7 +87,7 @@ void render() {
 int main() {
     cpInit();
     cpSetTargetFPS(60);
-    cpSetOverclock(OC_MUL_48);
+    cpSetOverclock(CP_OC_MUL_48);
 
     init();
 

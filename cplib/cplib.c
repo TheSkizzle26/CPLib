@@ -159,7 +159,7 @@ void cpQuit() {
     rlwCloseWindow();
 #else
     // reset clock speed
-    cpg_set_pll_mul(OC_MUL_DEFAULT);
+    cpg_set_pll_mul(CP_OC_MUL_DEFAULT);
 
     // restore lcd
     CALC_LCD_VRAMRestore();
