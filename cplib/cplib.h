@@ -176,8 +176,8 @@ cpVector3 cpWorldToCameraSpace(cpVector3 pos);
 cpVector2 cpCameraToScreenSpace(cpVector3 pos); // TODO: use vec2 once added
 
 void cpDrawMesh(cpMesh mesh, cpVector3 offset, cpColor tint);
-void cpDrawPixel3d(cpVector3 pos, cpColor tint); // not yet implemented
-void cpDrawLine3d(cpVector3 start, cpVector3 end, cpColor tint); // not yet implemented
+void cpDrawPixel3d(cpVector3 pos, cpColor tint);
+void cpDrawLine3d(cpVector3 start, cpVector3 end, cpColor tint);
 
 // collision detection functions (very bad)
 bool cpCheckCollisionLines(cpVector2i start1, cpVector2i end1, cpVector2i start2, cpVector2i end2, cpVector2i* collisionPoint);
