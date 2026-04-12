@@ -7,6 +7,7 @@
 
 #include "common.h"
 #include "vector.h"
+#include "rand.h"
 
 
 #ifdef TARGET_PC
