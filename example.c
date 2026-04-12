@@ -136,6 +136,28 @@ void render() {
     cpRegisterCamera3d(camera);
     cpDrawMesh(mesh, (cpVector3){}, WHITE);
 
+    // draw 3d dot
+    cpDrawPixel3d((cpVector3){
+        fix16_from_int(0),
+        fix16_from_str("0.25"),
+        fix16_from_int(0),
+    }, PURPLE);
+
+    // draw 3d line
+    cpDrawLine3d(
+        (cpVector3){
+            fix16_from_int(0),
+            fix16_from_str("0.3"),
+            fix16_from_int(-1),
+        },
+        (cpVector3){
+            fix16_from_str("0.5"),
+            fix16_from_str("0.5"),
+            fix16_from_int(0),
+        },
+        RED
+    );
+
     cpEndDrawing();
 }
 

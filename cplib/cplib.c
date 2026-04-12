@@ -528,11 +528,42 @@ void cpDrawMesh(const cpMesh mesh, const cpVector3 offset, const cpColor tint) {
 }
 
 void cpDrawPixel3d(const cpVector3 pos, const cpColor tint) {
+    const cpVector3 camCoord = cpWorldToCameraSpace(pos);
+    if (camCoord.z < fixEps)
+        return;
 
+    const cpVector2 screenCoord = cpCameraToScreenSpace(camCoord);
+    cpDrawPixel(
+        fix16_to_int(screenCoord.x),
+        fix16_to_int(screenCoord.y),
+        tint
+    );
 }
 
-void cpDrawLine3d(const cpVector3 a, const cpVector3 b, const cpColor tint) {
+void cpDrawLine3d(const cpVector3 start, const cpVector3 end, const cpColor tint) {
+    cpVector3 camStart = cpWorldToCameraSpace(start);
+    cpVector3 camEnd = cpWorldToCameraSpace(end);
 
+    // clip
+    if (camStart.z < fixEps && camEnd.z < fixEps)
+        return;
+
+    if (camStart.z < fixEps)
+        clipBehindCamera(&camStart, camEnd);
+    if (camEnd.z < fixEps)
+        clipBehindCamera(&camEnd, camStart);
+
+    // screen space
+    const cpVector2 screenCoordStart = cpCameraToScreenSpace(camStart);
+    const cpVector2 screenCoordEnd = cpCameraToScreenSpace(camEnd);
+
+    cpDrawLine(
+        fix16_to_int(screenCoordStart.x),
+        fix16_to_int(screenCoordStart.y),
+        fix16_to_int(screenCoordEnd.x),
+        fix16_to_int(screenCoordEnd.y),
+        tint
+    );
 }
 
 // collision detection functions
