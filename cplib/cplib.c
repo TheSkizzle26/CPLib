@@ -309,7 +309,6 @@ inline void cpDrawPixel(const int x, const int y, const cpColor tint) {
 }
 
 void cpDrawLine(int x1, int y1, int x2, int y2, cpColor tint) {
-    // TODO: add clipping
     // bresenham line algorithm, based on https://saturncloud.io/blog/bresenham-line-algorithm-a-powerful-tool-for-efficient-line-drawing/
     int dx = x2 - x1; if (dx < 0) dx *= -1;
     int dy = y2 - y1; if (dy < 0) dy *= -1;
@@ -358,7 +357,9 @@ void cpDrawLine(int x1, int y1, int x2, int y2, cpColor tint) {
             error += dx;
         }
 
-        cpDrawPixel(sx, sy, tint);
+        // I gave up on adding proper clipping :/
+        if (sx >= 0 && sx < screenWidth && sy >= 0 && sy < screenHeight)
+            cpDrawPixel(sx, sy, tint);
     }
 }
 
@@ -503,6 +504,56 @@ void cpDrawLine3d(const cpVector3 a, const cpVector3 b, const cpColor tint) {
 
 }
 
+// collision detection functions
+
+// internal function
+int pointOrientation(cpVector2i a, cpVector2i b, cpVector2i c) {
+    return (b.x - a.x) * (c.y - a.y) - (b.y - a.y) * (c.x - a.x);
+}
+
+int pointOnSegment(cpVector2i a, cpVector2i b, cpVector2i p) {
+    return p.x >= (a.x < b.x ? a.x : b.x) &&
+           p.x <= (a.x > b.x ? a.x : b.x) &&
+           p.y >= (a.y < b.y ? a.y : b.y) &&
+           p.y <= (a.y > b.y ? a.y : b.y);
+}
+
+// TODO: OPTIMIZE!!!
+bool cpCheckCollisionLines(const cpVector2i start1, const cpVector2i end1, const cpVector2i start2, const cpVector2i end2, cpVector2i* collisionPoint) {
+    bool collision = false;
+
+    const int o1 = pointOrientation(start1, end1, start2);
+    const int o2 = pointOrientation(start1, end1, end2);
+    const int o3 = pointOrientation(start2, end2, start1);
+    const int o4 = pointOrientation(start2, end2, end1);
+
+    if (o1 * o2 < 0 && o3 * o4 < 0) {
+        collision = true;
+    }
+
+    if (o1 == 0 && pointOnSegment(start1, end1, start2)) collision = true;
+    if (o2 == 0 && pointOnSegment(start1, end1, end2)) collision = true;
+    if (o3 == 0 && pointOnSegment(start2, end2, start1)) collision = true;
+    if (o4 == 0 && pointOnSegment(start2, end2, end1)) collision = true;
+
+    if (!collision) {
+        *collisionPoint = (cpVector2i) {0, 0};
+        return false;
+    }
+
+    const int denom = (start1.x - end1.x) * (start2.y - end2.y) - (start1.y - end1.y) * (start2.x - end2.x);
+    const int det1 = start1.x*end1.y - start1.y*end1.x;
+    const int det2 = start2.x*end2.y - start2.y*end2.x;
+    const int ix_num = det1*(start2.x - end2.x) - det2*(start1.x - end1.x);
+    const int iy_num = det1*(start2.y - end2.y) - det2*(start1.y - end1.y);
+
+    *collisionPoint = (cpVector2i) {
+        fix16_to_int(fix16_div(fix16_from_int(ix_num), fix16_from_int(denom))),
+        fix16_to_int(fix16_div(fix16_from_int(iy_num), fix16_from_int(denom))),
+    };
+
+    return true;
+}
 
 inline bool cpIsKeyDown(const cpKeyIndices keyIdx) {
     return keyState[keyIdx];

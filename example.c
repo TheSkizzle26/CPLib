@@ -73,7 +73,7 @@ void init() {
         {
             fix16_from_int(0),
             fix16_from_int(0),
-            fix16_from_int(-1),
+            fix16_from_int(-10),
         },
         0,
         0
@@ -106,7 +106,17 @@ void update() {
         texVy *= -1;
     }
 
-    camera.yaw += SIZE_MAX / 30;
+    camera.pos.z += fix16_div(
+        fix16_from_int(1),
+        fix16_from_int(20)
+    );
+
+    camera.yaw = fix16_sin(
+    fix16_div(
+            fix16_from_int(tick),
+            fix16_from_int(60)
+        )
+    );
 }
 
 void render() {
@@ -131,7 +141,7 @@ void render() {
 
 int main() {
     cpInit();
-    cpSetTargetFPS(60);
+    cpSetTargetFPS(20);
     cpSetOverclock(CP_OC_MUL_48);
 
     init();

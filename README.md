@@ -5,7 +5,8 @@ Also runs on both the calculator and your PC!
 # Use
 Just copy the "cplib" folder into your project.\
 Also take a look at linker.ld, Makefile and of course example.c.\
-The 3D rendering works a bit differently than raylib's. Just take a look at the 3d part in cplib/cplib.h.
+The 3D rendering works a bit differently than raylib's. Just take a look at the 3d part in cplib/cplib.h. \
+All the 3D functions use floats, the 2D ones ints.
 
 # Features:
 - very similar to raylib

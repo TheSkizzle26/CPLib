@@ -159,16 +159,13 @@ int cpGetScreenWidth();
 int cpGetScreenHeight();
 uint16_t* cpGetFramebuffer();
 
-// collision detection functions
-void cpCheckCollisionLines();
-
 // 2d drawing functions
 void cpBeginDrawing();
 void cpEndDrawing();
 
 void cpClearBackground(cpColor tint);
-void cpDrawPixel(int x, int y, cpColor tint); // no clipping
-void cpDrawLine(int x1, int y1, int x2, int y2, cpColor tint); // no clipping (for now)
+void cpDrawPixel(int x, int y, cpColor tint); // no clipping for performance reasons
+void cpDrawLine(int x1, int y1, int x2, int y2, cpColor tint);
 void cpDrawRectangle(int x, int y, int w, int h, cpColor tint);
 void cpDrawCircle(int centerX, int centerY, int radius, cpColor tint);
 void cpDrawTexture(cpTexture texture, int x, int y); // no tint for you sir
@@ -181,6 +178,9 @@ cpVector3 cpCameraToScreenSpace(cpVector3 pos); // TODO: use vec2 once added
 void cpDrawMesh(cpMesh mesh, cpVector3 offset, cpColor tint);
 void cpDrawPixel3d(cpVector3 pos, cpColor tint); // not yet implemented
 void cpDrawLine3d(cpVector3 a, cpVector3 b, cpColor tint); // not yet implemented
+
+// collision detection functions (very bad)
+bool cpCheckCollisionLines(cpVector2i start1, cpVector2i end1, cpVector2i start2, cpVector2i end2, cpVector2i* collisionPoint);
 
 // input functions
 bool cpIsKeyDown(cpKeyIndices keyIdx);
