@@ -1,6 +1,6 @@
 # CPLib
 A library for drawing, input, etc. for the ClassPad II calculator.\
-Functions very similar to RayLib.
+Also runs on both the calculator and your PC!
 
 # Use
 Just copy the "cplib" folder into your project.\
