@@ -310,7 +310,7 @@ void cpEndDrawing() {
 }
 
 inline void cpClearBackground(const cpColor tint) {
-    for (size_t i = 0; i < numPixels; i++)
+    for (int i = 0; i < numPixels; i++)
         pixelBuf[i] = tint;
 }
 
