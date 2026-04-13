@@ -132,8 +132,9 @@ typedef struct {
 } cpTexture;
 
 typedef struct {
-    cpVector3 pos;
-    fix16_t yaw, pitch;
+    cpVector3 position;
+    cpVector3 target; // global (e.g. position + rotation)
+    fix16_t fovY;
 } cpCamera3d;
 
 typedef struct {
@@ -148,19 +149,26 @@ typedef struct {
 } cpMesh;
 
 
+// general
+
 void cpInit();
 void cpQuit();
 
 void cpSetTargetFPS(int value);
 void cpSetOverclock(cpOverclockMultipliers mul);
 
-cpColor cpRGBtoColor(uint8_t r, uint8_t g, uint8_t b);
+// utilities
+
+cpColor cpRGBToColor(uint8_t r, uint8_t g, uint8_t b);
+void cpVector3ToRotation(cpVector3 v, fix16_t* yaw, fix16_t* pitch);
+cpVector3 cpRotationToVector3(fix16_t yaw, fix16_t pitch);
 
 int cpGetScreenWidth();
 int cpGetScreenHeight();
 uint16_t* cpGetFramebuffer();
 
 // 2d drawing functions
+
 void cpBeginDrawing();
 void cpEndDrawing();
 
@@ -172,9 +180,13 @@ void cpDrawCircle(int centerX, int centerY, int radius, cpColor tint);
 void cpDrawTexture(cpTexture texture, int x, int y); // no tint for you sir
 
 // 3d drawing functions
+
 void cpRegisterCamera3d(cpCamera3d camera);
+cpVector3 cpGetCamera3dRotation(cpCamera3d camera);
+void cpSetCamera3dRotation(cpCamera3d* camera, cpVector3 rotation);
+
 cpVector3 cpWorldToCameraSpace(cpVector3 pos);
-cpVector2 cpCameraToScreenSpace(cpVector3 pos); // TODO: use vec2 once added
+cpVector2 cpCameraToScreenSpace(cpVector3 pos);
 
 void cpDrawMesh(cpMesh mesh, cpVector3 offset, cpColor tint);
 void cpDrawPixel3d(cpVector3 pos, cpColor tint);

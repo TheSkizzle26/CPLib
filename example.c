@@ -69,15 +69,9 @@ void init() {
     memcpy(mesh.edges, edges, sizeof(edges));
 
     // init camera
-    camera = (cpCamera3d) {
-        {
-            fix16_from_int(0),
-            fix16_from_int(0),
-            fix16_from_int(-3),
-        },
-        0,
-        0
-    };
+    camera = (cpCamera3d) {0};
+    camera.position.z = fix16_from_int(-3);
+    camera.fovY = fix16_from_int(90);
 }
 
 void update() {
@@ -106,17 +100,15 @@ void update() {
         texVy *= -1;
     }
 
-    camera.pos.z += fix16_div(
+    camera.position.z += fix16_div(
         fix16_from_int(1),
         fix16_from_int(20)
     );
 
-    camera.yaw = fix16_sin(
-    fix16_div(
-            fix16_from_int(tick),
-            fix16_from_int(60)
-        )
-    );
+    fix16_t yaw, pitch;
+    cpVector3ToRotation(cpGetCamera3dRotation(camera), &yaw, &pitch);
+    yaw = fix16_add(yaw, fix16_from_str("0.1"));
+    cpSetCamera3dRotation(&camera, cpRotationToVector3(yaw, pitch));
 }
 
 void render() {

@@ -110,6 +110,11 @@ static uint32_t keyCodes[NUM_KEYS] = {
 };
 #endif
 
+typedef struct {
+    cpVector3 position;
+    fix16_t yaw, pitch;
+    fix16_t focalLength;
+} cpInternalCamera3d;
 
 static int screenWidth, screenHeight;
 static int numPixels;
@@ -118,7 +123,7 @@ static cpColor* pixelBuf __attribute__((aligned(32))); // faster memcpy
 static bool keyState[NUM_KEYS];
 static bool lastKeyState[NUM_KEYS];
 
-static cpCamera3d camera3d;
+static cpInternalCamera3d internalCamera3d;
 
 // some constants for 3d rendering
 static fix16_t fixHalfScreenWidth;
@@ -157,8 +162,9 @@ void cpInit() {
 
     pixelBuf = (cpColor*)malloc(sizeof(cpColor) * numPixels);
     memset(pixelBuf, 0, (int)sizeof(cpColor) * numPixels);
-
     cpSetTargetFPS(0);
+
+    internalCamera3d = (cpInternalCamera3d) {0};
 
     fixHalfScreenWidth = fix16_from_int(screenWidth / 2);
     fixHalfScreenHeight = fix16_from_int(screenHeight / 2);
@@ -212,9 +218,22 @@ void cpSetOverclock(cpOverclockMultipliers mul) {
 #endif
 }
 
-inline cpColor cpRGBtoColor(const uint8_t r, const uint8_t g, const uint8_t b) {
+inline cpColor cpRGBToColor(const uint8_t r, const uint8_t g, const uint8_t b) {
     // https://stackoverflow.com/a/11471397
     return ((r & 0b11111000) << 8) | ((g & 0b11111100) << 3) | (b >> 3);
+}
+
+inline void cpVector3ToRotation(const cpVector3 v, fix16_t* yaw, fix16_t* pitch) {
+    *yaw = fix16_atan2(v.z, v.x);
+    *pitch = fix16_asin(v.y);
+}
+
+inline cpVector3 cpRotationToVector3(const fix16_t yaw, const fix16_t pitch) {
+    return (cpVector3) {
+        fix16_mul(fix16_cos(pitch), fix16_cos(yaw)),
+        fix16_sin(pitch),
+        fix16_mul(fix16_cos(pitch), fix16_sin(yaw)),
+    };
 }
 
 inline int cpGetScreenWidth() {
@@ -526,17 +545,30 @@ void cpDrawTexture(const cpTexture texture, const int x, const int y) {
 }
 
 void cpRegisterCamera3d(const cpCamera3d camera) {
-    memcpy(&camera3d, &camera, sizeof(cpCamera3d));
+    internalCamera3d.position = camera.position;
+    cpVector3ToRotation(cpGetCamera3dRotation(camera), &internalCamera3d.yaw, &internalCamera3d.pitch);
+    internalCamera3d.focalLength = fix16_div(
+        fixHalfScreenHeight,
+        fix16_tan(fix16_mul(fix16_deg_to_rad(camera.fovY), fix16_from_str("0.5")))
+    );
+}
+
+cpVector3 cpGetCamera3dRotation(const cpCamera3d camera) {
+    return cpVector3Normalize(cpVector3Subtract(camera.target, camera.position));
+}
+
+void cpSetCamera3dRotation(cpCamera3d* camera, const cpVector3 rotation) {
+    camera->target = cpVector3Add(camera->position, cpVector3Normalize(rotation));
 }
 
 cpVector3 cpWorldToCameraSpace(const cpVector3 pos) {
-    return cpVector3Subtract(pos, camera3d.pos);
+    return cpVector3Subtract(pos, internalCamera3d.position);
 }
 
 cpVector2 cpCameraToScreenSpace(const cpVector3 pos) {
     return (cpVector2) {
-        fix16_add(fix16_mul(fix16_div(pos.x, pos.z), fixHalfScreenWidth), fixHalfScreenWidth),
-        fix16_add(fix16_mul(fix16_div(pos.y, pos.z), fixNegHalfScreenHeight), fixHalfScreenHeight)
+        fix16_add(fix16_mul(fix16_div(pos.x, pos.z), internalCamera3d.focalLength), fixHalfScreenWidth),
+        fix16_sub(fixHalfScreenHeight, fix16_mul(fix16_div(pos.y, pos.z), internalCamera3d.focalLength))
     };
 }
 
