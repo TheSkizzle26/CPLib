@@ -114,7 +114,6 @@ static uint32_t keyCodes[NUM_KEYS] = {
 static int screenWidth, screenHeight;
 static int numPixels;
 static cpColor* pixelBuf __attribute__((aligned(32))); // faster memcpy
-static bool fpsUnlocked;
 
 static bool keyState[NUM_KEYS];
 static bool lastKeyState[NUM_KEYS];
@@ -131,6 +130,7 @@ static fix16_t fixEps;
 static void* rlTexture;
 static uint8_t* rlPixelBuf;
 #else
+static bool fpsUnlocked;
 static uint16_t* calcVRAM;
 #endif
 
