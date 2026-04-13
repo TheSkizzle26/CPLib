@@ -319,7 +319,68 @@ inline void cpDrawPixel(const int x, const int y, const cpColor tint) {
     pixelBuf[y*screenWidth + x] = tint;
 }
 
-void cpDrawLine(int x1, int y1, int x2, int y2, cpColor tint) {
+void cpDrawLineClipped(int x1, int y1, int x2, int y2, const cpColor tint) {
+    // just a copy of the function below but with clipping
+    int dx = x2 - x1; if (dx < 0) dx *= -1;
+    int dy = y2 - y1; if (dy < 0) dy *= -1;
+    const bool slope = dy > dx;
+
+    if (slope) {
+        int temp = x1;
+        x1 = y1;
+        y1 = temp;
+
+        temp = x2;
+        x2 = y2;
+        y2 = temp;
+    }
+
+    if (x1 > x2) {
+        int temp = x1;
+        x1 = x2;
+        x2 = temp;
+
+        temp = y1;
+        y1 = y2;
+        y2 = temp;
+    }
+
+    dx = x2 - x1; if (dx < 0) dx *= -1;
+    dy = y2 - y1; if (dy < 0) dy *= -1;
+    int error = dx / 2;
+    int y = y1;
+    int ystep = y1 < y2 ? 1 : -1;
+
+    for (int x = x1; x < x2+1; x++) {
+        int sx, sy;
+
+        if (slope) {
+            sx = y;
+            sy = x;
+        } else {
+            sx = x;
+            sy = y;
+        }
+
+        error -= dy;
+        if (error < 0) {
+            y += ystep;
+            error += dx;
+        }
+
+        // this is literally the only difference
+        if (sx >= 0 && sx < screenWidth && sy >= 0 && sy < screenHeight)
+            cpDrawPixel(sx, sy, tint);
+    }
+}
+
+void cpDrawLine(int x1, int y1, int x2, int y2, const cpColor tint) {
+    if (x1 < 0 || x1 >= screenWidth || x2 < 0 || x2 >= screenWidth ||
+        y1 < 0 || y1 >= screenHeight || y2 < 0 || y2 >= screenHeight) {
+        cpDrawLineClipped(x1, y1, x2, y2, tint);
+        return;
+    }
+
     // bresenham line algorithm, based on https://saturncloud.io/blog/bresenham-line-algorithm-a-powerful-tool-for-efficient-line-drawing/
     int dx = x2 - x1; if (dx < 0) dx *= -1;
     int dy = y2 - y1; if (dy < 0) dy *= -1;
@@ -368,9 +429,7 @@ void cpDrawLine(int x1, int y1, int x2, int y2, cpColor tint) {
             error += dx;
         }
 
-        // I gave up on adding proper clipping :/
-        if (sx >= 0 && sx < screenWidth && sy >= 0 && sy < screenHeight)
-            cpDrawPixel(sx, sy, tint);
+        cpDrawPixel(sx, sy, tint);
     }
 }
 
