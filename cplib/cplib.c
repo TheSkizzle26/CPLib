@@ -660,10 +660,18 @@ void cpDrawPixel3d(const cpVector3 pos, const cpColor tint) {
     if (camCoord.z < fixEps)
         return;
 
-    const cpVector2 screenCoord = cpCameraToScreenSpace(camCoord);
+    const cpVector2 screenCoordFix = cpCameraToScreenSpace(camCoord);
+    const cpVector2 screenCoord = {
+        fix16_to_int(screenCoordFix.x),
+        fix16_to_int(screenCoordFix.y),
+    };
+
+    if (screenCoord.x < 0 || screenCoord.x >= screenWidth || screenCoord.y < 0 || screenCoord.y >= screenHeight)
+        return;
+
     cpDrawPixel(
-        fix16_to_int(screenCoord.x),
-        fix16_to_int(screenCoord.y),
+        screenCoord.x,
+        screenCoord.y,
         tint
     );
 }
