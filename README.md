@@ -41,6 +41,7 @@ int main() {
 ```
 
 # TODOs:
+- **use vectors for rendering instead of yaw and pitch**
 - add CALC_* prefix to cmt, power, etc.
 - use dmac for rendering
 - add clipping for some rendering functions

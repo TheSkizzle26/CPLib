@@ -22,12 +22,15 @@ APP_VERSION("0.0.0")
 static bool isRunning;
 static int tick;
 
-cpTexture texture;
-int texX, texY;
-int texVx, texVy;
+static cpTexture texture;
+static int texX, texY;
+static int texVx, texVy;
 
-cpMesh mesh;
-cpCamera3d camera;
+static cpMesh mesh;
+
+static cpCamera3d camera;
+static fix16_t cameraYaw;
+static fix16_t cameraPitch;
 
 
 void init() {
@@ -47,15 +50,38 @@ void init() {
     texVy = 5;
 
     // init mesh
-    const cpVector3i vertices[] = {
-        {fix16_from_int(-1), fix16_from_int(-1), fix16_from_int(0)},
-        {fix16_from_int(1), fix16_from_int(-1), fix16_from_int(0)},
-        {fix16_from_int(0), fix16_from_int(1), fix16_from_int(0)},
+    const cpVector3 vertices[] = {
+        {fix16_from_str("-0.545028"), fix16_from_str("0.0"), fix16_from_str("0.589031")},
+        {fix16_from_str("0.545028"), fix16_from_str("0.0"), fix16_from_str("0.589031")},
+        {fix16_from_str("0.0"), fix16_from_str("0.0"), fix16_from_str("-1.0")},
+        {fix16_from_str("0.0"), fix16_from_str("0.0"), fix16_from_str("-1.0")},
+        {fix16_from_str("0.0"), fix16_from_str("0.0"), fix16_from_str("0.381579")},
+        {fix16_from_str("0.0"), fix16_from_str("0.0"), fix16_from_str("-1.0")},
+        {fix16_from_str("0.0"), fix16_from_str("0.266022"), fix16_from_str("0.115845")},
     };
     const cpMeshEdge edges[] = {
-        {0, 1},
-        {1, 2},
+        {4, 0},
+        {3, 1},
+        {5, 4},
+        {4, 6},
+        {0, 2},
+        {1, 6},
+        {2, 5},
+        {1, 3},
+        {6, 5},
+        {4, 5},
+        {5, 6},
+        {5, 3},
+        {0, 4},
+        {6, 1},
+        {6, 4},
+        {4, 1},
+        {3, 5},
+        {5, 2},
         {2, 0},
+        {1, 4},
+        {0, 6},
+        {6, 0},
     };
 
     mesh = (cpMesh) {
@@ -70,8 +96,11 @@ void init() {
 
     // init camera
     camera = (cpCamera3d) {0};
-    camera.position.z = fix16_from_int(-3);
+    camera.position.y = fix16_from_int(1);
     camera.fovY = fix16_from_int(90);
+
+    cameraYaw = fix16_from_int(0);
+    cameraPitch = fix16_from_int(0);
 }
 
 void update() {
@@ -100,15 +129,16 @@ void update() {
         texVy *= -1;
     }
 
-    camera.position.z += fix16_div(
-        fix16_from_int(1),
+    const fix16_t t = fix16_div(
+        fix16_from_int(tick),
         fix16_from_int(20)
     );
 
-    fix16_t yaw, pitch;
-    cpVector3ToRotation(cpGetCamera3dRotation(camera), &yaw, &pitch);
-    yaw = fix16_add(yaw, fix16_from_str("0.1"));
-    cpSetCamera3dRotation(&camera, cpRotationToVector3(yaw, pitch));
+    // move camera around mesh
+    camera.position.x = fix16_mul(fix16_sin(t), fix16_from_int(2));
+    camera.position.z = fix16_mul(fix16_cos(t), fix16_from_int(2));
+
+    // camera.position.x = fix16_sin(t);
 }
 
 void render() {
@@ -121,12 +151,14 @@ void render() {
     cpDrawLine(0, 0, tick, 0, WHITE);
     cpDrawCircle(150, 100, 30, WHITE);
 
-    // texture drawing, empty texture for now since it crashes on the cp?!?
+    // bouncing texture
     cpDrawTexture(texture, texX, texY);
 
-    // draw mesh
+    // register camera for 3d rendering
     cpRegisterCamera3d(camera);
-    cpDrawMesh(mesh, (cpVector3){}, WHITE);
+
+    // draw mesh
+    cpDrawMesh(mesh, (cpVector3){0}, WHITE);
 
     // draw 3d dot
     cpDrawPixel3d((cpVector3){

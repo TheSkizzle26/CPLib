@@ -24,6 +24,13 @@ typedef struct {
     int x, y, z;
 } cpVector3i;
 
+typedef struct {
+    fix16_t x, y, z, w;
+} cpVector4;
+
+// cpVector4i not needed for now
+
+
 
 // I was bored.
 
@@ -80,6 +87,25 @@ cpVector3i cpVector3iDivide(cpVector3i a, cpVector3i b);
 cpVector3i cpVector3iDivideValue(cpVector3i a, int b);
 
 cpVector3i cpVector3iNegate(cpVector3i v);
+
+// not even used anywhere, but whatever...
+// maybe remove?
+
+cpVector4 cpVector4Add(cpVector4 a, cpVector4 b); // uses software floats!
+cpVector4 cpVector4AddValue(cpVector4 a, fix16_t b); // uses software floats!
+cpVector4 cpVector4Subtract(cpVector4 a, cpVector4 b); // uses software floats!
+cpVector4 cpVector4SubtractValue(cpVector4 a, fix16_t b); // uses software floats!
+cpVector4 cpVector4Multiply(cpVector4 a, cpVector4 b); // uses software floats!
+cpVector4 cpVector4MultiplyValue(cpVector4 a, fix16_t b); // uses software floats!
+cpVector4 cpVector4Divide(cpVector4 a, cpVector4 b); // uses software floats!
+cpVector4 cpVector4DivideValue(cpVector4 a, fix16_t b); // uses software floats!
+
+cpVector4 cpVector4Negate(cpVector4 v); // uses software floats!
+fix16_t cpVector4Length(cpVector4 v); // uses software floats!
+fix16_t cpVector4Distance(cpVector4 a, cpVector4 b); // uses software floats!
+fix16_t cpVector4DotProduct(cpVector4 a, cpVector4 b); // uses software floats!
+/* not implemented */ // cpVector4 cpVector4CrossProduct(cpVector4 a, cpVector4 b); // uses software floats!
+cpVector4 cpVector4Normalize(cpVector4 v); // uses software floats!
 
 
 #endif

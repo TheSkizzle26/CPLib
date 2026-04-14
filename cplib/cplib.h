@@ -7,6 +7,7 @@
 
 #include "common.h"
 #include "vector.h"
+#include "matrix.h"
 #include "rand.h"
 
 
@@ -160,8 +161,8 @@ void cpSetOverclock(cpOverclockMultipliers mul);
 // utilities
 
 cpColor cpRGBToColor(uint8_t r, uint8_t g, uint8_t b);
-void cpVector3ToRotation(cpVector3 v, fix16_t* yaw, fix16_t* pitch);
-cpVector3 cpRotationToVector3(fix16_t yaw, fix16_t pitch);
+void cpVector3ToAngles(cpVector3 v, fix16_t* yaw, fix16_t* pitch);
+cpVector3 cpAnglesToVector3(fix16_t yaw, fix16_t pitch);
 
 int cpGetScreenWidth();
 int cpGetScreenHeight();
@@ -182,8 +183,8 @@ void cpDrawTexture(cpTexture texture, int x, int y); // no tint for you sir
 // 3d drawing functions
 
 void cpRegisterCamera3d(cpCamera3d camera);
-cpVector3 cpGetCamera3dRotation(cpCamera3d camera);
-void cpSetCamera3dRotation(cpCamera3d* camera, cpVector3 rotation);
+cpVector3 cpGetCamera3dDirection(cpCamera3d camera);
+void cpSetCamera3dDirection(cpCamera3d* camera, cpVector3 rotation);
 
 cpVector3 cpWorldToCameraSpace(cpVector3 pos);
 cpVector2 cpCameraToScreenSpace(cpVector3 pos);

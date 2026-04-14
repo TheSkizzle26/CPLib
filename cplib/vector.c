@@ -42,6 +42,19 @@
     (a.z) op (b), \
 };
 
+#define F4_OP(op) return (cpVector4) { \
+    fix16_##op(a.x, b.x), \
+    fix16_##op(a.y, b.y), \
+    fix16_##op(a.z, b.z), \
+    fix16_##op(a.w, b.w), \
+};
+#define F4_OP_VAL(op) return (cpVector4) { \
+    fix16_##op(a.x, b), \
+    fix16_##op(a.y, b), \
+    fix16_##op(a.z, b), \
+    fix16_##op(a.w, b), \
+};
+
 
 /* cpVector2 */
 
@@ -290,4 +303,83 @@ cpVector3i cpVector3iNegate(const cpVector3i v) {
     };
 }
 
+/* cpVector4 */
 
+cpVector4 cpVector4Add(const cpVector4 a, const cpVector4 b) {
+    F4_OP(add)
+}
+
+cpVector4 cpVector4AddValue(const cpVector4 a, const fix16_t b) {
+    F4_OP_VAL(add)
+}
+
+cpVector4 cpVector4Subtract(const cpVector4 a, const cpVector4 b) {
+    F4_OP(sub)
+}
+
+cpVector4 cpVector4SubtractValue(const cpVector4 a, const fix16_t b) {
+    F4_OP_VAL(sub)
+}
+
+cpVector4 cpVector4Multiply(const cpVector4 a, const cpVector4 b) {
+    F4_OP(mul)
+}
+
+cpVector4 cpVector4MultiplyValue(const cpVector4 a, const fix16_t b) {
+    F4_OP_VAL(mul)
+}
+
+cpVector4 cpVector4Divide(const cpVector4 a, const cpVector4 b) {
+    F4_OP(div)
+}
+
+cpVector4 cpVector4DivideValue(const cpVector4 a, const fix16_t b) {
+    F4_OP_VAL(div)
+}
+
+inline cpVector4 cpVector4Negate(const cpVector4 v) {
+    return cpVector4MultiplyValue(v, fix16_from_int(-1));
+}
+
+fix16_t cpVector4Length(const cpVector4 v) {
+    return fix16_sqrt(
+        fix16_add(
+            fix16_mul(v.x, v.x),
+            fix16_add(
+                fix16_mul(v.y, v.y),
+                fix16_add(
+                    fix16_mul(v.z, v.z),
+                    fix16_mul(v.w, v.w)
+                )
+            )
+        )
+    );
+}
+
+fix16_t cpVector4Distance(const cpVector4 a, const cpVector4 b) {
+    const cpVector4 d = cpVector4Subtract(a, b);
+    return cpVector4Length(d);
+}
+
+fix16_t cpVector4DotProduct(const cpVector4 a, const cpVector4 b) {
+    return fix16_add(
+        fix16_mul(a.x, b.x),
+        fix16_add(
+            fix16_mul(a.y, b.y),
+            fix16_add(
+                fix16_mul(a.z, b.z),
+                fix16_mul(a.w, a.w)
+            )
+        )
+    );
+}
+
+// CrossProduct not implemented
+
+cpVector4 cpVector4Normalize(const cpVector4 v) {
+    const fix16_t length = cpVector4Length(v);
+    return cpVector4DivideValue(
+        v,
+        length
+    );
+}

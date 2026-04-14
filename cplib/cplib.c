@@ -5,6 +5,8 @@
 
 #include "cplib.h"
 #include "common.h"
+#include "vector.h"
+#include "matrix.h"
 #include <stdint.h>
 #include <stdbool.h>
 
@@ -111,8 +113,9 @@ static uint32_t keyCodes[NUM_KEYS] = {
 #endif
 
 typedef struct {
-    cpVector3 position;
-    fix16_t yaw, pitch;
+    cpVector3 position; // use this instead of storing pos in viewMatrix, would require mat4x4
+    fix16_t cosYaw, sinYaw;
+    fix16_t cosPitch, sinPitch;
     fix16_t focalLength;
 } cpInternalCamera3d;
 
@@ -223,12 +226,13 @@ inline cpColor cpRGBToColor(const uint8_t r, const uint8_t g, const uint8_t b) {
     return ((r & 0b11111000) << 8) | ((g & 0b11111100) << 3) | (b >> 3);
 }
 
-inline void cpVector3ToRotation(const cpVector3 v, fix16_t* yaw, fix16_t* pitch) {
+// expects normalized vector
+inline void cpVector3ToAngles(const cpVector3 v, fix16_t* yaw, fix16_t* pitch) {
     *yaw = fix16_atan2(v.z, v.x);
-    *pitch = fix16_asin(v.y);
+    *pitch = fix16_mul(fix16_asin(v.y), fix16_from_int(-1));
 }
 
-inline cpVector3 cpRotationToVector3(const fix16_t yaw, const fix16_t pitch) {
+inline cpVector3 cpAnglesToVector3(const fix16_t yaw, const fix16_t pitch) {
     return (cpVector3) {
         fix16_mul(fix16_cos(pitch), fix16_cos(yaw)),
         fix16_sin(pitch),
@@ -338,7 +342,7 @@ inline void cpDrawPixel(const int x, const int y, const cpColor tint) {
     pixelBuf[y*screenWidth + x] = tint;
 }
 
-void cpDrawLineClipped(int x1, int y1, int x2, int y2, const cpColor tint) {
+static void cpDrawLineClippedSub(int x1, int y1, int x2, int y2, const cpColor tint) {
     // just a copy of the function below but with clipping
     int dx = x2 - x1; if (dx < 0) dx *= -1;
     int dy = y2 - y1; if (dy < 0) dy *= -1;
@@ -396,7 +400,7 @@ void cpDrawLineClipped(int x1, int y1, int x2, int y2, const cpColor tint) {
 void cpDrawLine(int x1, int y1, int x2, int y2, const cpColor tint) {
     if (x1 < 0 || x1 >= screenWidth || x2 < 0 || x2 >= screenWidth ||
         y1 < 0 || y1 >= screenHeight || y2 < 0 || y2 >= screenHeight) {
-        cpDrawLineClipped(x1, y1, x2, y2, tint);
+        cpDrawLineClippedSub(x1, y1, x2, y2, tint);
         return;
     }
 
@@ -506,7 +510,7 @@ void cpDrawCircle(int centerX, int centerY, int radius, cpColor tint) {
     }
 }
 
-void cpDrawTexture_RGB565(const cpTexture texture, const int x, const int y) {
+static void cpDrawTexture_RGB565(const cpTexture texture, const int x, const int y) {
     const int tw = x + texture.width >= screenWidth ? screenWidth - x : texture.width;
     const int th = y + texture.height >= screenHeight ? screenHeight - y : texture.height;
 
@@ -519,7 +523,7 @@ void cpDrawTexture_RGB565(const cpTexture texture, const int x, const int y) {
     }
 }
 
-void cpDrawTexture_RGB565_A8(const cpTexture texture, const int x, const int y) {
+static void cpDrawTexture_RGB565_A8(const cpTexture texture, const int x, const int y) {
     const int tw = x + texture.width >= screenWidth ? screenWidth - x : texture.width;
     const int th = y + texture.height >= screenHeight ? screenHeight - y : texture.height;
 
@@ -546,23 +550,46 @@ void cpDrawTexture(const cpTexture texture, const int x, const int y) {
 
 void cpRegisterCamera3d(const cpCamera3d camera) {
     internalCamera3d.position = camera.position;
-    cpVector3ToRotation(cpGetCamera3dRotation(camera), &internalCamera3d.yaw, &internalCamera3d.pitch);
+
+    fix16_t yaw, pitch;
+    cpVector3ToAngles(cpGetCamera3dDirection(camera), &yaw, &pitch);
+
+    yaw = fix16_sub(
+        yaw,
+        fix16_div(fix16_pi, fix16_from_int(2))
+    );
+
+    internalCamera3d.cosYaw = fix16_cos(-yaw);
+    internalCamera3d.sinYaw = fix16_sin(-yaw);
+    internalCamera3d.cosPitch = fix16_cos(-pitch);
+    internalCamera3d.sinPitch = fix16_sin(-pitch);
+
     internalCamera3d.focalLength = fix16_div(
         fixHalfScreenHeight,
         fix16_tan(fix16_mul(fix16_deg_to_rad(camera.fovY), fix16_from_str("0.5")))
     );
 }
 
-cpVector3 cpGetCamera3dRotation(const cpCamera3d camera) {
+cpVector3 cpGetCamera3dDirection(const cpCamera3d camera) {
     return cpVector3Normalize(cpVector3Subtract(camera.target, camera.position));
 }
 
-void cpSetCamera3dRotation(cpCamera3d* camera, const cpVector3 rotation) {
+void cpSetCamera3dDirection(cpCamera3d* camera, const cpVector3 rotation) {
     camera->target = cpVector3Add(camera->position, cpVector3Normalize(rotation));
 }
 
 cpVector3 cpWorldToCameraSpace(const cpVector3 pos) {
-    return cpVector3Subtract(pos, internalCamera3d.position);
+    const cpVector3 localPos = cpVector3Subtract(pos, internalCamera3d.position);
+
+    const fix16_t x1 = fix16_sub(fix16_mul(localPos.x, internalCamera3d.cosYaw), fix16_mul(localPos.z, internalCamera3d.sinYaw));
+    const fix16_t z1 = fix16_add(fix16_mul(localPos.x, internalCamera3d.sinYaw), fix16_mul(localPos.z, internalCamera3d.cosYaw));
+
+    const fix16_t y1 = fix16_sub(fix16_mul(localPos.y, internalCamera3d.cosPitch), fix16_mul(z1, internalCamera3d.sinPitch));
+    const fix16_t z2 = fix16_add(fix16_mul(localPos.y, internalCamera3d.sinPitch), fix16_mul(z1, internalCamera3d.cosPitch));
+
+    return (cpVector3) {
+        x1, y1, z2
+    };
 }
 
 cpVector2 cpCameraToScreenSpace(const cpVector3 pos) {
@@ -572,7 +599,7 @@ cpVector2 cpCameraToScreenSpace(const cpVector3 pos) {
     };
 }
 
-void clipBehindCamera(cpVector3* start, const cpVector3 end) {
+static void clipBehindCamera(cpVector3* start, const cpVector3 end) {
     const fix16_t zero = fix16_from_int(0);
     const fix16_t one = fix16_from_int(1);
 
@@ -674,11 +701,11 @@ void cpDrawLine3d(const cpVector3 start, const cpVector3 end, const cpColor tint
 // collision detection functions
 
 // internal function
-int pointOrientation(cpVector2i a, cpVector2i b, cpVector2i c) {
+static int pointOrientation(cpVector2i a, cpVector2i b, cpVector2i c) {
     return (b.x - a.x) * (c.y - a.y) - (b.y - a.y) * (c.x - a.x);
 }
 
-int pointOnSegment(cpVector2i a, cpVector2i b, cpVector2i p) {
+static int pointOnSegment(cpVector2i a, cpVector2i b, cpVector2i p) {
     return p.x >= (a.x < b.x ? a.x : b.x) &&
            p.x <= (a.x > b.x ? a.x : b.x) &&
            p.y >= (a.y < b.y ? a.y : b.y) &&
