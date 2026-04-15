@@ -42,7 +42,7 @@ int main() {
 
 # Additional Features
 Some features are disabled by default. Enable them by adding the appropriate definition
-before you include CPLib.
+in your makefile.
 
 **CPLIB_IMPLEMENT_VECTOR3I:** Implement cpVector3i struct and arithmetic functions.\
 **CPLIB_IMPLEMENT_VECTOR4:** Implement cpVector4 struct and arithmetic functions.\

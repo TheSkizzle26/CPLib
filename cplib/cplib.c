@@ -336,9 +336,14 @@ inline void cpClearBackground(const cpColor tint) {
         pixelBuf[i] = tint;
 }
 
-// DOESN'T HAVE CLIPPING!!! (for performance reasons)
-inline void cpDrawPixel(const int x, const int y, const cpColor tint) {
+// no clipping
+inline void cpDrawPixelUnsafe(const int x, const int y, const cpColor tint) {
     pixelBuf[y*screenWidth + x] = tint;
+}
+
+inline void cpDrawPixel(const int x, const int y, const cpColor tint) {
+    if (x >= 0 && x < screenWidth && y >= 0 && y < screenHeight)
+        pixelBuf[y*screenWidth + x] = tint;
 }
 
 static void cpDrawLineClippedSub(int x1, int y1, int x2, int y2, const cpColor tint) {
@@ -392,7 +397,7 @@ static void cpDrawLineClippedSub(int x1, int y1, int x2, int y2, const cpColor t
 
         // this is literally the only difference
         if (sx >= 0 && sx < screenWidth && sy >= 0 && sy < screenHeight)
-            cpDrawPixel(sx, sy, tint);
+            cpDrawPixelUnsafe(sx, sy, tint);
     }
 }
 
@@ -451,7 +456,7 @@ void cpDrawLine(int x1, int y1, int x2, int y2, const cpColor tint) {
             error += dx;
         }
 
-        cpDrawPixel(sx, sy, tint);
+        cpDrawPixelUnsafe(sx, sy, tint);
     }
 }
 
@@ -464,12 +469,12 @@ void cpDrawRectangle(int x, int y, int w, int h, cpColor tint) {
 
     for (int sy = y; sy < y+h; sy++) {
         for (int sx = x; sx < x+w; sx++) {
-            cpDrawPixel(sx, sy, tint);
+            cpDrawPixelUnsafe(sx, sy, tint);
         }
     }
 }
 
-void cpDrawCircle(int centerX, int centerY, int radius, cpColor tint) {
+void cpDrawCircle(const int centerX, const int centerY, const int radius, const cpColor tint) {
     // TODO: optimize clipping maybe?
     // based off: https://stackoverflow.com/questions/1201200/fast-algorithm-for-drawing-filled-circles
     int x = radius;
@@ -483,18 +488,18 @@ void cpDrawCircle(int centerX, int centerY, int radius, cpColor tint) {
             if (i < 0 || i >= screenWidth) continue;
 
             if (centerY + y >= 0 && centerY + y < screenHeight)
-                cpDrawPixel(i, centerY + y, tint);
+                cpDrawPixelUnsafe(i, centerY + y, tint);
             if (centerY - y >= 0 && centerY - y < screenHeight)
-                cpDrawPixel(i, centerY - y, tint);
+                cpDrawPixelUnsafe(i, centerY - y, tint);
         }
 
         for (int i = centerX - y; i <= centerX + y; i++) {
             if (i < 0 || i >= screenWidth) continue;
 
             if (centerY + x >= 0 && centerY + x < screenHeight)
-                cpDrawPixel(i, centerY + x, tint);
+                cpDrawPixelUnsafe(i, centerY + x, tint);
             if (centerY - x >= 0 && centerY - x < screenHeight)
-                cpDrawPixel(i, centerY - x, tint);
+                cpDrawPixelUnsafe(i, centerY - x, tint);
         }
 
         y++;
@@ -517,7 +522,7 @@ static void cpDrawTexture_RGB565(const cpTexture texture, const int x, const int
         for (int tx = x < 0 ? -x : 0; tx < tw; tx++) {
             const uint32_t i = (ty * texture.width) + tx;
             const uint16_t color = ((uint16_t*)texture.data)[i];
-            cpDrawPixel(x + tx, y + ty, color);
+            cpDrawPixelUnsafe(x + tx, y + ty, color);
         }
     }
 }
@@ -531,7 +536,7 @@ static void cpDrawTexture_RGB565_A8(const cpTexture texture, const int x, const 
             const uint32_t i = (ty * texture.width) + tx;
             const uint16_t color = *(uint16_t*)(texture.data + i*3);
             const bool alpha = *(bool*)(texture.data + i*3 + 2);
-            if (alpha) cpDrawPixel(x + tx, y + ty, color);
+            if (alpha) cpDrawPixelUnsafe(x + tx, y + ty, color);
         }
     }
 }
@@ -662,7 +667,7 @@ void cpDrawPixel3d(const cpVector3 pos, const cpColor tint) {
     if (screenCoord.x < 0 || screenCoord.x >= screenWidth || screenCoord.y < 0 || screenCoord.y >= screenHeight)
         return;
 
-    cpDrawPixel(
+    cpDrawPixelUnsafe(
         screenCoord.x,
         screenCoord.y,
         tint
@@ -699,9 +704,6 @@ void cpDrawLine3d(const cpVector3 start, const cpVector3 end, const cpColor tint
     );
 }
 
-// collision detection functions
-
-// internal function
 static int pointOrientation(cpVector2i a, cpVector2i b, cpVector2i c) {
     return (b.x - a.x) * (c.y - a.y) - (b.y - a.y) * (c.x - a.x);
 }
@@ -713,7 +715,7 @@ static int pointOnSegment(cpVector2i a, cpVector2i b, cpVector2i p) {
            p.y <= (a.y > b.y ? a.y : b.y);
 }
 
-// TODO: OPTIMIZE!!!
+// probably not very optimized
 bool cpCheckCollisionLines(const cpVector2i start1, const cpVector2i end1, const cpVector2i start2, const cpVector2i end2, cpVector2i* collisionPoint) {
     bool collision = false;
 

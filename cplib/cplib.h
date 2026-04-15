@@ -166,7 +166,7 @@ cpVector3 cpAnglesToVector3(fix16_t yaw, fix16_t pitch);
 
 int cpGetScreenWidth();
 int cpGetScreenHeight();
-uint16_t* cpGetFramebuffer();
+uint16_t* cpGetFramebuffer(); // squeeze out that last bit of performance
 
 // 2d drawing functions
 
@@ -174,11 +174,12 @@ void cpBeginDrawing();
 void cpEndDrawing();
 
 void cpClearBackground(cpColor tint);
-void cpDrawPixel(int x, int y, cpColor tint); // no clipping for performance reasons
+void cpDrawPixelUnsafe(int x, int y, cpColor tint); // no clipping
+void cpDrawPixel(int x, int y, cpColor tint);
 void cpDrawLine(int x1, int y1, int x2, int y2, cpColor tint);
 void cpDrawRectangle(int x, int y, int w, int h, cpColor tint);
 void cpDrawCircle(int centerX, int centerY, int radius, cpColor tint);
-void cpDrawTexture(cpTexture texture, int x, int y); // no tint for you sir
+void cpDrawTexture(cpTexture texture, int x, int y);
 
 // 3d drawing functions
 

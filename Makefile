@@ -22,35 +22,38 @@ APP_NAME:=cplib_test
 #The pc compiler
 FIXPOINT_DEFS := -DFIXMATH_NO_CACHE -DFIXMATH_NO_CTYPE -DFIXMATH_NO_HARD_DIVISION -DFIXMATH_FAST_SIN -DFIXMATH_NO_64BIT
 
-C_PC:=gcc
-C_PC_FLAGS:=-W -Wall -DTARGET_PC -lraylib $(FIXPOINT_DEFS)
+# enable some features here (for example -DCPLIB_IMPLEMENT_MATRIX4)
+CPLIB_FEATURES :=
+
+C_PC := gcc
+C_PC_FLAGS := -W -Wall -DTARGET_PC -lraylib $(FIXPOINT_DEFS) $(CPLIB_FEATURES)
 
 #The sh4 assembler, compiler and linker:
-AS:=sh4-elf-as
-AS_FLAGS:=
+AS := sh4-elf-as
+AS_FLAGS :=
 
-CC:=sh4-elf-gcc
-CC_FLAGS:=-ffreestanding -fshort-wchar -Wall -Wextra -O2 $(FIXPOINT_DEFS)
+CC := sh4-elf-gcc
+CC_FLAGS := -ffreestanding -fshort-wchar -Wall -Wextra -O2 $(FIXPOINT_DEFS) $(CPLIB_FEATURES)
 
-CXX:=sh4-elf-g++
-CXX_FLAGS:=-ffreestanding -fno-exceptions -fno-rtti -fshort-wchar -Wall -Wextra -O2 $(FIXPOINT_DEFS)
+CXX := sh4-elf-g++
+CXX_FLAGS := -ffreestanding -fno-exceptions -fno-rtti -fshort-wchar -Wall -Wextra -O2 $(FIXPOINT_DEFS) $(CPLIB_FEATURES)
 
-LD:=sh4-elf-gcc
-LD_FLAGS:=-nostartfiles -nostdlib
+LD := sh4-elf-gcc
+LD_FLAGS := -nostartfiles -nostdlib
 
-READELF:=sh4-elf-readelf
-OBJCOPY:=sh4-elf-objcopy
+READELF := sh4-elf-readelf
+OBJCOPY := sh4-elf-objcopy
 
-AS_SOURCES:=$(shell find $(SOURCEDIR) -name '*.s')
-CC_SOURCES:=$(shell find $(SOURCEDIR) -name '*.c')
-CXX_SOURCES:=$(shell find $(SOURCEDIR) -name '*.cpp')
-H_INC:=$(shell find $(SOURCEDIR) -name '*.h')
-HPP_INC:=$(shell find $(SOURCEDIR) -name '*.hpp')
-OBJECTS:=$(AS_SOURCES:.s=.o) $(CC_SOURCES:.c=.o) $(CXX_SOURCES:.cpp=.o)
+AS_SOURCES := $(shell find $(SOURCEDIR) -name '*.s')
+CC_SOURCES := $(shell find $(SOURCEDIR) -name '*.c')
+CXX_SOURCES := $(shell find $(SOURCEDIR) -name '*.cpp')
+H_INC := $(shell find $(SOURCEDIR) -name '*.h')
+HPP_INC := $(shell find $(SOURCEDIR) -name '*.hpp')
+OBJECTS := $(AS_SOURCES:.s=.o) $(CC_SOURCES:.c=.o) $(CXX_SOURCES:.cpp=.o)
 
-APP_PC:=_$(APP_NAME).elf
+APP_PC := _$(APP_NAME).elf
 
-APP_ELF:=$(APP_NAME).hhk
+APP_ELF := $(APP_NAME).hhk
 
 all: pc hhk
 
