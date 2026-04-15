@@ -304,6 +304,7 @@ cpVector3i cpVector3iNegate(const cpVector3i v) {
 }
 
 /* cpVector4 */
+#ifdef CPLIB_IMPLEMENT_VECTOR4
 
 cpVector4 cpVector4Add(const cpVector4 a, const cpVector4 b) {
     F4_OP(add)
@@ -383,3 +384,5 @@ cpVector4 cpVector4Normalize(const cpVector4 v) {
         length
     );
 }
+
+#endif

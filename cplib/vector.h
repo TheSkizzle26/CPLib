@@ -24,9 +24,11 @@ typedef struct {
     int x, y, z;
 } cpVector3i;
 
+#ifdef CPLIB_IMPLEMENT_VECTOR4
 typedef struct {
     fix16_t x, y, z, w;
 } cpVector4;
+#endif
 
 // cpVector4i not needed for now
 
@@ -88,8 +90,9 @@ cpVector3i cpVector3iDivideValue(cpVector3i a, int b);
 
 cpVector3i cpVector3iNegate(cpVector3i v);
 
-// not even used anywhere, but whatever...
-// maybe remove?
+// define CPLIB_IMPLEMENT_VECTOR4 to use these
+
+#ifdef CPLIB_IMPLEMENT_VECTOR4
 
 cpVector4 cpVector4Add(cpVector4 a, cpVector4 b); // uses software floats!
 cpVector4 cpVector4AddValue(cpVector4 a, fix16_t b); // uses software floats!
@@ -107,5 +110,6 @@ fix16_t cpVector4DotProduct(cpVector4 a, cpVector4 b); // uses software floats!
 /* not implemented */ // cpVector4 cpVector4CrossProduct(cpVector4 a, cpVector4 b); // uses software floats!
 cpVector4 cpVector4Normalize(cpVector4 v); // uses software floats!
 
+#endif
 
 #endif

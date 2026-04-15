@@ -37,6 +37,8 @@ cpVector3 cpMatrix3MultiplyVector(const cpMatrix3 A, const cpVector3 v) {
     };
 }
 
+#ifdef CPLIB_IMPLEMENT_MATRIX4
+
 cpMatrix4 cpMatrix4Multiply(const cpMatrix4 A, const cpMatrix4 B) {
     cpMatrix4 C = {0};
 
@@ -74,3 +76,5 @@ cpVector4 cpMatrix4MultiplyVector(const cpMatrix4 A, const cpVector4 v) {
         fix16_add(fix16_add(fix16_add(fix16_mul(A.wx, v.x), fix16_mul(A.wy, v.y)), fix16_mul(A.wz, v.z)), fix16_mul(A.ww, v.w)),
     };
 }
+
+#endif

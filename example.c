@@ -9,8 +9,6 @@
  * just copy the cplib folder to your project and take a look
  * at this example script. You may also want to copy linker.ld and Makefile.
  */
-
-
 #include "cplib/cplib.h"
 
 APP_NAME("CPLib test")
@@ -143,13 +141,13 @@ void update() {
 
 void render() {
     cpBeginDrawing();
-    cpClearBackground(BLACK);
+    cpClearBackground(CP_BLACK);
 
     // basic shapes
-    cpDrawLine(0, 0, 100, 100, RED);
-    cpDrawRectangle(tick % cpGetScreenWidth(), 250, 100, 50, SKYBLUE);
-    cpDrawLine(0, 0, tick, 0, WHITE);
-    cpDrawCircle(150, 100, 30, WHITE);
+    cpDrawLine(0, 0, 100, 100, CP_RED);
+    cpDrawRectangle(tick % cpGetScreenWidth(), 250, 100, 50, CP_SKYBLUE);
+    cpDrawLine(0, 0, tick, 0, CP_WHITE);
+    cpDrawCircle(150, 100, 30, CP_WHITE);
 
     // bouncing texture
     cpDrawTexture(texture, texX, texY);
@@ -158,14 +156,14 @@ void render() {
     cpRegisterCamera3d(camera);
 
     // draw mesh
-    cpDrawMesh(mesh, (cpVector3){0}, WHITE);
+    cpDrawMesh(mesh, (cpVector3){0}, CP_WHITE);
 
     // draw 3d dot
     cpDrawPixel3d((cpVector3){
         fix16_from_int(0),
         fix16_from_str("0.25"),
         fix16_from_int(0),
-    }, PURPLE);
+    }, CP_PURPLE);
 
     // draw 3d line
     cpDrawLine3d(
@@ -179,7 +177,7 @@ void render() {
             fix16_from_str("0.5"),
             fix16_from_int(0),
         },
-        RED
+        CP_RED
     );
 
     cpEndDrawing();

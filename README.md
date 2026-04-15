@@ -6,7 +6,7 @@ Runs on both the calculator and your PC!
 Just copy the "cplib" folder into your project.\
 Also take a look at linker.ld, Makefile and of course example.c.\
 The 3D rendering works a bit differently than raylib's. Just take a look at the 3d part in cplib/cplib.h. \
-All the 3D functions use floats, the 2D ones ints.
+All the 3D functions use floats, the 2D ones ints.\
 If you want to run this on your PC, you will need to have raylib installed.
 
 # Features:
@@ -39,6 +39,13 @@ int main() {
     return true;
 }
 ```
+
+# Additional Features
+Some features are disabled by default. Enable them by adding the appropriate definition
+before you include CPLib.
+
+**CPLIB_IMPLEMENT_VECTOR4:** Implement vector4 struct and arithmetic functions.\
+**CPLIB_IMPLEMENT_MATRIX4:** Implement matrix4 struct and arithmetic functions. Automatically enabled vector4 aswell.
 
 # TODOs:
 - **use vectors for rendering instead of yaw and pitch**
