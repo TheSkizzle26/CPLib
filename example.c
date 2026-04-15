@@ -27,8 +27,6 @@ static int texVx, texVy;
 static cpMesh mesh;
 
 static cpCamera3d camera;
-static fix16_t cameraYaw;
-static fix16_t cameraPitch;
 
 
 void init() {
@@ -96,9 +94,6 @@ void init() {
     camera = (cpCamera3d) {0};
     camera.position.y = fix16_from_int(1);
     camera.fovY = fix16_from_int(90);
-
-    cameraYaw = fix16_from_int(0);
-    cameraPitch = fix16_from_int(0);
 }
 
 void update() {
