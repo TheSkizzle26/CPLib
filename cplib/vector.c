@@ -262,6 +262,7 @@ cpVector3 cpVector3Normalize(const cpVector3 v) {
 }
 
 /* cpVector3i */
+#ifdef CPLIB_IMPLEMENT_VECTOR3I
 
 cpVector3i cpVector3iAdd(const cpVector3i a, const cpVector3i b) {
     I3_OP(+)
@@ -302,6 +303,8 @@ cpVector3i cpVector3iNegate(const cpVector3i v) {
         -v.z
     };
 }
+
+#endif
 
 /* cpVector4 */
 #ifdef CPLIB_IMPLEMENT_VECTOR4
