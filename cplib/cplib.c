@@ -563,7 +563,7 @@ void cpRegisterCamera3d(const cpCamera3d camera) {
 
     const cpVector3 cameraForward = cpGetCamera3dDirection(camera); // already normalized
     const cpVector3 cameraRight = cpVector3Normalize(cpVector3CrossProduct(worldUp, cameraForward));
-    const cpVector3 cameraUp = cpVector3Normalize(cpVector3CrossProduct(cameraForward, cameraRight));
+    const cpVector3 cameraUp = cpVector3CrossProduct(cameraForward, cameraRight);
 
     internalCamera3d.rotationMatrix = cpMatrix3Transpose((cpMatrix3) {
         cameraRight.x, cameraUp.x, cameraForward.x,
