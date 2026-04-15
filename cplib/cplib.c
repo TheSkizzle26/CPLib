@@ -114,8 +114,7 @@ static uint32_t keyCodes[NUM_KEYS] = {
 
 typedef struct {
     cpVector3 position; // use this instead of storing pos in viewMatrix, would require mat4x4
-    fix16_t cosYaw, sinYaw;
-    fix16_t cosPitch, sinPitch;
+    cpMatrix3 rotationMatrix;
     fix16_t focalLength;
 } cpInternalCamera3d;
 
@@ -551,18 +550,21 @@ void cpDrawTexture(const cpTexture texture, const int x, const int y) {
 void cpRegisterCamera3d(const cpCamera3d camera) {
     internalCamera3d.position = camera.position;
 
-    fix16_t yaw, pitch;
-    cpVector3ToAngles(cpGetCamera3dDirection(camera), &yaw, &pitch);
+    const cpVector3 worldUp = (cpVector3) {
+        fix16_from_int(0),
+        fix16_from_int(1),
+        fix16_from_int(0)
+    };
 
-    yaw = fix16_sub(
-        yaw,
-        fix16_div(fix16_pi, fix16_from_int(2))
-    );
+    const cpVector3 cameraForward = cpGetCamera3dDirection(camera); // already normalized
+    const cpVector3 cameraRight = cpVector3Normalize(cpVector3CrossProduct(worldUp, cameraForward));
+    const cpVector3 cameraUp = cpVector3Normalize(cpVector3CrossProduct(cameraForward, cameraRight));
 
-    internalCamera3d.cosYaw = fix16_cos(-yaw);
-    internalCamera3d.sinYaw = fix16_sin(-yaw);
-    internalCamera3d.cosPitch = fix16_cos(-pitch);
-    internalCamera3d.sinPitch = fix16_sin(-pitch);
+    internalCamera3d.rotationMatrix = cpMatrix3Transpose((cpMatrix3) {
+        cameraRight.x, cameraUp.x, cameraForward.x,
+        cameraRight.y, cameraUp.y, cameraForward.y,
+        cameraRight.z, cameraUp.z, cameraForward.z,
+    });
 
     internalCamera3d.focalLength = fix16_div(
         fixHalfScreenHeight,
@@ -580,16 +582,7 @@ void cpSetCamera3dDirection(cpCamera3d* camera, const cpVector3 rotation) {
 
 cpVector3 cpWorldToCameraSpace(const cpVector3 pos) {
     const cpVector3 localPos = cpVector3Subtract(pos, internalCamera3d.position);
-
-    const fix16_t x1 = fix16_sub(fix16_mul(localPos.x, internalCamera3d.cosYaw), fix16_mul(localPos.z, internalCamera3d.sinYaw));
-    const fix16_t z1 = fix16_add(fix16_mul(localPos.x, internalCamera3d.sinYaw), fix16_mul(localPos.z, internalCamera3d.cosYaw));
-
-    const fix16_t y1 = fix16_sub(fix16_mul(localPos.y, internalCamera3d.cosPitch), fix16_mul(z1, internalCamera3d.sinPitch));
-    const fix16_t z2 = fix16_add(fix16_mul(localPos.y, internalCamera3d.sinPitch), fix16_mul(z1, internalCamera3d.cosPitch));
-
-    return (cpVector3) {
-        x1, y1, z2
-    };
+    return cpMatrix3MultiplyVector(internalCamera3d.rotationMatrix, localPos);
 }
 
 cpVector2 cpCameraToScreenSpace(const cpVector3 pos) {
