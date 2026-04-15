@@ -652,7 +652,7 @@ void cpDrawPixel3d(const cpVector3 pos, const cpColor tint) {
         return;
 
     const cpVector2 screenCoordFix = cpCameraToScreenSpace(camCoord);
-    const cpVector2 screenCoord = {
+    const cpVector2i screenCoord = {
         fix16_to_int(screenCoordFix.x),
         fix16_to_int(screenCoordFix.y),
     };
@@ -693,6 +693,24 @@ void cpDrawLine3d(const cpVector3 start, const cpVector3 end, const cpColor tint
         fix16_to_int(screenCoordStart.y),
         fix16_to_int(screenCoordEnd.x),
         fix16_to_int(screenCoordEnd.y),
+        tint
+    );
+}
+
+void cpDrawCircle3d(const cpVector3 center, const fix16_t radius, const cpColor tint) {
+    const cpVector3 camCoord = cpWorldToCameraSpace(center);
+    if (camCoord.z < fixEps)
+        return;
+
+    const cpVector2 screenCoord = cpCameraToScreenSpace(camCoord);
+
+    const fix16_t distance = cpVector3Distance(center, internalCamera3d.position);
+    const fix16_t screenRadius = fix16_mul(fix16_div(radius, distance), fixHalfScreenHeight);
+
+    cpDrawCircle(
+        fix16_to_int(screenCoord.x),
+        fix16_to_int(screenCoord.y),
+        fix16_to_int(screenRadius),
         tint
     );
 }

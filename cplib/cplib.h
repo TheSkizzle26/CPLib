@@ -193,6 +193,7 @@ cpVector2 cpCameraToScreenSpace(cpVector3 pos);
 void cpDrawMesh(cpMesh mesh, cpVector3 offset, cpMatrix3 transform, cpColor tint);
 void cpDrawPixel3d(cpVector3 pos, cpColor tint);
 void cpDrawLine3d(cpVector3 start, cpVector3 end, cpColor tint);
+void cpDrawCircle3d(cpVector3 center, fix16_t radius, cpColor tint);
 
 // collision detection functions (very bad)
 bool cpCheckCollisionLines(cpVector2i start1, cpVector2i end1, cpVector2i start2, cpVector2i end2, cpVector2i* collisionPoint);
