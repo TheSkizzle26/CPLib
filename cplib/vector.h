@@ -90,8 +90,6 @@ cpVector3i cpVector3iDivideValue(cpVector3i a, int b);
 
 cpVector3i cpVector3iNegate(cpVector3i v);
 
-// define CPLIB_IMPLEMENT_VECTOR4 to use these
-
 #ifdef CPLIB_IMPLEMENT_VECTOR4
 
 cpVector4 cpVector4Add(cpVector4 a, cpVector4 b); // uses software floats!

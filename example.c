@@ -135,8 +135,6 @@ void update() {
     // move camera around mesh
     camera.position.x = fix16_mul(fix16_sin(t), fix16_from_int(2));
     camera.position.z = fix16_mul(fix16_cos(t), fix16_from_int(2));
-
-    // camera.position.x = fix16_sin(t);
 }
 
 void render() {
