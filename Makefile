@@ -20,7 +20,7 @@ APP_NAME:=cplib_test
 
 #If you use AS sources make sure to write the same functions in C++ because sh4 as does not run on the pc
 #The pc compiler
-FIXPOINT_DEFS := -DFIXMATH_NO_CACHE -DFIXMATH_NO_CTYPE -DFIXMATH_NO_HARD_DIVISION -DFIXMATH_FAST_SIN -DFIXMATH_NO_64BIT
+FIXPOINT_DEFS := -DFIXMATH_NO_CACHE -DFIXMATH_NO_CTYPE -DFIXMATH_NO_HARD_DIVISION -DFIXMATH_NO_64BIT # -DFIXMATH_FAST_SIN (excluded to not make 3d camera jitter)
 
 # enable some features here (for example -DCPLIB_IMPLEMENT_MATRIX4)
 CPLIB_FEATURES :=
