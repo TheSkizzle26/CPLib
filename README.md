@@ -45,7 +45,7 @@ Some features are disabled by default. Enable them by adding the appropriate def
 before you include CPLib.
 
 **CPLIB_IMPLEMENT_VECTOR4:** Implement vector4 struct and arithmetic functions.\
-**CPLIB_IMPLEMENT_MATRIX4:** Implement matrix4 struct and arithmetic functions. Automatically enabled vector4 aswell.
+**CPLIB_IMPLEMENT_MATRIX4:** Implement matrix4 struct and arithmetic functions. *Automatically enables vector4 as well*.
 
 # TODOs:
 - **use vectors for rendering instead of yaw and pitch**
