@@ -92,7 +92,7 @@ void init() {
 
     // init camera
     camera = (cpCamera3d) {0};
-    camera.position.y = fix16_from_int(1);
+    camera.position.y = fix16_from_int(2);
     camera.fovY = fix16_from_int(90);
 }
 
@@ -128,8 +128,8 @@ void update() {
     );
 
     // move camera around mesh
-    camera.position.x = fix16_mul(fix16_sin(t), fix16_from_int(2));
-    camera.position.z = fix16_mul(fix16_cos(t), fix16_from_int(2));
+    camera.position.x = fix16_mul(fix16_sin(t), fix16_from_int(3));
+    camera.position.z = fix16_mul(fix16_cos(t), fix16_from_int(3));
 }
 
 void render() {
@@ -148,12 +148,40 @@ void render() {
     // register camera for 3d rendering
     cpRegisterCamera3d(camera);
 
+    const fix16_t t = fix16_div(
+        fix16_from_int(tick),
+        fix16_from_int(6)
+    );
+
     // draw mesh
-    cpDrawMesh(mesh, (cpVector3){0}, CP_WHITE);
+    cpSetRandomSeed(123);
+
+    const cpVector3 meshDirection = (cpVector3) {
+        fix16_sin(t),
+        0,
+        fix16_cos(t),
+    };
+
+    for (int i = 0; i < 5; i++) {
+        const cpMatrix3 meshTransform = cpMatrix3CreateRotation(meshDirection);
+
+        const int x = cpGetRandomValue(-2, 2);
+        const int z = cpGetRandomValue(-2, 2);
+        cpDrawMesh(
+            mesh,
+            (cpVector3) {
+                fix16_from_int(x),
+                fix16_from_int(-i + 2),
+                fix16_from_int(z)
+            },
+            meshTransform,
+            CP_WHITE
+        );
+    }
 
     // draw 3d dot
     cpDrawPixel3d((cpVector3){
-        fix16_from_int(0),
+        fix16_from_str("-0.5"),
         fix16_from_str("0.25"),
         fix16_from_int(0),
     }, CP_PURPLE);

@@ -190,7 +190,7 @@ void cpSetCamera3dDirection(cpCamera3d* camera, cpVector3 rotation);
 cpVector3 cpWorldToCameraSpace(cpVector3 pos);
 cpVector2 cpCameraToScreenSpace(cpVector3 pos);
 
-void cpDrawMesh(cpMesh mesh, cpVector3 offset, cpColor tint);
+void cpDrawMesh(cpMesh mesh, cpVector3 offset, cpMatrix3 transform, cpColor tint);
 void cpDrawPixel3d(cpVector3 pos, cpColor tint);
 void cpDrawLine3d(cpVector3 start, cpVector3 end, cpColor tint);
 

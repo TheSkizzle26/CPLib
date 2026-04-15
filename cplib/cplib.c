@@ -555,21 +555,8 @@ void cpDrawTexture(const cpTexture texture, const int x, const int y) {
 void cpRegisterCamera3d(const cpCamera3d camera) {
     internalCamera3d.position = camera.position;
 
-    const cpVector3 worldUp = (cpVector3) {
-        fix16_from_int(0),
-        fix16_from_int(1),
-        fix16_from_int(0)
-    };
-
-    const cpVector3 cameraForward = cpGetCamera3dDirection(camera); // already normalized
-    const cpVector3 cameraRight = cpVector3Normalize(cpVector3CrossProduct(worldUp, cameraForward));
-    const cpVector3 cameraUp = cpVector3CrossProduct(cameraForward, cameraRight);
-
-    internalCamera3d.rotationMatrix = cpMatrix3Transpose((cpMatrix3) {
-        cameraRight.x, cameraUp.x, cameraForward.x,
-        cameraRight.y, cameraUp.y, cameraForward.y,
-        cameraRight.z, cameraUp.z, cameraForward.z,
-    });
+    const cpVector3 cameraDirection = cpGetCamera3dDirection(camera);
+    internalCamera3d.rotationMatrix = cpMatrix3Transpose(cpMatrix3CreateRotation(cameraDirection));
 
     internalCamera3d.focalLength = fix16_div(
         fixHalfScreenHeight,
@@ -610,19 +597,25 @@ static void clipBehindCamera(cpVector3* start, const cpVector3 end) {
     start->z = fix16_add(start->z, fix16_mul(s, fix16_sub(end.z, start->z))); if (start->z == zero) start->z = one;
 }
 
-void cpDrawMesh(const cpMesh mesh, const cpVector3 offset, const cpColor tint) {
-    cpVector3* camCoords = malloc(sizeof(cpVector3) * mesh.vertexCount);
+void cpDrawMesh(const cpMesh mesh, const cpVector3 offset, const cpMatrix3 transform, const cpColor tint) {
+    cpVector3* coords = malloc(sizeof(cpVector3) * mesh.vertexCount);
 
+    // apply mesh transform
     for (size_t i = 0; i < mesh.vertexCount; i++) {
-        camCoords[i] = cpWorldToCameraSpace(
-            cpVector3Add(mesh.vertices[i], offset)
+        coords[i] = cpMatrix3MultiplyVector(transform, mesh.vertices[i]);
+    }
+
+    // transform to camera space
+    for (size_t i = 0; i < mesh.vertexCount; i++) {
+        coords[i] = cpWorldToCameraSpace(
+            cpVector3Add(coords[i], offset)
         );
     }
 
     for (size_t i = 0; i < mesh.edgeCount; i++) {
         const cpMeshEdge edge = mesh.edges[i];
-        cpVector3 start = camCoords[edge.a];
-        cpVector3 end = camCoords[edge.b];
+        cpVector3 start = coords[edge.a];
+        cpVector3 end = coords[edge.b];
 
         // clip
         if (start.z < fixEps && end.z < fixEps)
@@ -650,7 +643,7 @@ void cpDrawMesh(const cpMesh mesh, const cpVector3 offset, const cpColor tint) {
         );
     }
 
-    free(camCoords);
+    free(coords);
 }
 
 void cpDrawPixel3d(const cpVector3 pos, const cpColor tint) {

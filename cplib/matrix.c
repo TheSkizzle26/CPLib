@@ -3,6 +3,33 @@
 #include "matrix.h"
 
 
+cpMatrix3 cpMatrix3CreateIdentity() {
+    return (cpMatrix3) {
+        fix16_one,  0,          0,
+        0,          fix16_one,  0,
+        0,          0,          fix16_one,
+    };
+}
+
+cpMatrix3 cpMatrix3CreateScalar(const fix16_t value) {
+    return (cpMatrix3) {
+        value,      0,          0,
+        0,          value,  0,
+        0,          0,      value,
+    };
+}
+
+cpMatrix3 cpMatrix3CreateRotation(cpVector3 direction) {
+    const cpVector3 right = cpVector3Normalize(cpVector3CrossProduct((cpVector3) {0, fix16_one, 0}, direction));
+    const cpVector3 up = cpVector3CrossProduct(direction, right);
+
+    return (cpMatrix3) {
+        right.x, up.x, direction.x,
+        right.y, up.y, direction.y,
+        right.z, up.z, direction.z,
+    };
+}
+
 cpMatrix3 cpMatrix3Transpose(cpMatrix3 A) {
     return (cpMatrix3) {
         A.xx, A.yx, A.zx,
@@ -38,6 +65,36 @@ cpVector3 cpMatrix3MultiplyVector(const cpMatrix3 A, const cpVector3 v) {
 }
 
 #ifdef CPLIB_IMPLEMENT_MATRIX4
+
+cpMatrix4 cpMatrix4CreateIdentity() {
+    return (cpMatrix4) {
+        fix16_one,  0,          0,          0,
+        0,          fix16_one,  0,          0,
+        0,          0,          fix16_one,  0,
+        0,          0,          0,          fix16_one,
+    };
+}
+
+cpMatrix4 cpMatrix4CreateIdentity(const fix16_t value) {
+    return (cpMatrix4) {
+        value,      0,          0,          0,
+        0,          value,      0,          0,
+        0,          0,          value,      0,
+        0,          0,          0,          value,
+    };
+}
+
+cpMatrix4 cpMatrix4CreateRotation(cpVector3 direction) {
+    const cpVector3 right = cpVector3Normalize(cpVector3CrossProduct((cpVector3) {0, fix16_one, 0}, direction));
+    const cpVector3 up = cpVector3CrossProduct(direction, right);
+
+    return (cpMatrix4) {
+        right.x, up.x, direction.x, 0,
+        right.y, up.y, direction.y, 0,
+        right.z, up.z, direction.z, 0,
+        0, 0, 0, fix16_one,
+    };
+}
 
 cpMatrix4 cpMatrix4Multiply(const cpMatrix4 A, const cpMatrix4 B) {
     cpMatrix4 C = {0};
