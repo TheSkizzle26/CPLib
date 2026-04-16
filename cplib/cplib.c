@@ -535,7 +535,14 @@ static void cpDrawTexture_RGB565(const cpTexture texture, const int x, const int
     for (int ty = y < 0 ? -y : 0; ty < th; ty++) {
         for (int tx = x < 0 ? -x : 0; tx < tw; tx++) {
             const uint32_t i = (ty * texture.width) + tx;
+
+#ifdef TARGET_PC
+            uint16_t color = ((uint16_t*)texture.data)[i];
+            color = (color >> 8) | ((color & 0xFF) << 8);
+#else
             const uint16_t color = ((uint16_t*)texture.data)[i];
+#endif
+
             cpDrawPixelUnsafe(x + tx, y + ty, color);
         }
     }
@@ -548,7 +555,14 @@ static void cpDrawTexture_RGB565_A8(const cpTexture texture, const int x, const 
     for (int ty = y < 0 ? -y : 0; ty < th; ty++) {
         for (int tx = x < 0 ? -x : 0; tx < tw; tx++) {
             const uint32_t i = (ty * texture.width) + tx;
+
+#ifdef TARGET_PC
+            uint16_t color = *(uint16_t*)(texture.data + i*3);
+            color = (color >> 8) | ((color & 0xFF) << 8);
+#else
             const uint16_t color = *(uint16_t*)(texture.data + i*3);
+#endif
+
             const bool alpha = *(bool*)(texture.data + i*3 + 2);
             if (alpha) cpDrawPixelUnsafe(x + tx, y + ty, color);
         }
