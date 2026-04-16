@@ -132,6 +132,8 @@ typedef struct {
     void* data;
 } cpTexture;
 
+#ifdef CPLIB_ENABLE_3D
+
 typedef struct {
     cpVector3 position;
     cpVector3 target; // global (e.g. position + rotation)
@@ -149,60 +151,67 @@ typedef struct {
     cpMeshEdge* edges;
 } cpMesh;
 
+#endif
+
 
 // general
 
-void cpInit();
-void cpQuit();
+void cpInit(); // Initialize CPLib.
+void cpQuit(); // Finish CPLib.
 
-void cpSetTargetFPS(int value);
-void cpSetOverclock(cpOverclockMultipliers mul);
+void cpSetTargetFPS(int value); // Set the target FPS.
+void cpSetOverclock(cpOverclockMultipliers mul); // Set the overclock multiplier.
 
 // utilities
 
-cpColor cpRGBToColor(uint8_t r, uint8_t g, uint8_t b) [[unsequenced]];
-void cpVector3ToAngles(cpVector3 v, fix16_t* yaw, fix16_t* pitch) [[unsequenced]];
-cpVector3 cpAnglesToVector3(fix16_t yaw, fix16_t pitch) [[unsequenced]];
+cpColor cpRGBToColor(uint8_t r, uint8_t g, uint8_t b) [[unsequenced]]; // Convert RGB values to a color.
+void cpVector3ToAngles(cpVector3 v, fix16_t* yaw, fix16_t* pitch) [[unsequenced]]; // Convert a cpVector3 to individual angles.
+cpVector3 cpAnglesToVector3(fix16_t yaw, fix16_t pitch) [[unsequenced]];// Convert individual angles to a cpVector3.
 
-int cpGetScreenWidth() [[unsequenced]];
-int cpGetScreenHeight() [[unsequenced]];
-uint16_t* cpGetFramebuffer() [[unsequenced]]; // squeeze out that last bit of performance
+int cpGetScreenWidth() [[unsequenced]]; // Get the screen's width.
+int cpGetScreenHeight() [[unsequenced]]; // Get the screen's height.
+uint16_t* cpGetFramebuffer() [[unsequenced]]; // Get a pointer to the framebuffer.
 
 // 2d drawing functions
 
-void cpBeginDrawing();
-void cpEndDrawing();
+void cpBeginDrawing(); // Initialize drawing.
+void cpEndDrawing(); // Finish drawing.
 
-void cpClearBackground(cpColor tint);
-void cpDrawPixelUnsafe(int x, int y, cpColor tint); // no clipping
-void cpDrawPixel(int x, int y, cpColor tint);
-void cpDrawLine(int x1, int y1, int x2, int y2, cpColor tint);
-void cpDrawRectangle(int x, int y, int w, int h, cpColor tint);
-void cpDrawCircle(int centerX, int centerY, int radius, cpColor tint);
-void cpDrawTexture(cpTexture texture, int x, int y);
+void cpClearBackground(cpColor tint); // Clear the background using a given color.
+void cpDrawPixelUnsafe(int x, int y, cpColor tint); // Draw a pixel, no clipping.
+void cpDrawPixel(int x, int y, cpColor tint); // Draw a pixel.
+void cpDrawLine(int x1, int y1, int x2, int y2, cpColor tint); // Draw a line.
+void cpDrawRectangle(int x, int y, int w, int h, cpColor tint); // Draw a rectangle.
+void cpDrawCircle(int centerX, int centerY, int radius, cpColor tint); // Draw a circle.
+void cpDrawTexture(cpTexture texture, int x, int y); // Draw a texture.
 
 // 3d drawing functions
+#ifdef CPLIB_ENABLE_3D
 
-void cpRegisterCamera3d(cpCamera3d camera);
-cpVector3 cpGetCamera3dDirection(cpCamera3d camera) [[unsequenced]];
-void cpSetCamera3dDirection(cpCamera3d* camera, cpVector3 rotation);
+void cpRegisterCamera3d(cpCamera3d camera); // Register the camera to use for drawing. Must be called before 3d rendering every frame.
+cpVector3 cpGetCamera3dDirection(cpCamera3d camera) [[unsequenced]]; // Get the direction a camera is facing in.
+void cpSetCamera3dDirection(cpCamera3d* camera, cpVector3 rotation); // Set the direction a camera is facing in.
 
-cpVector3 cpWorldToCameraSpace(cpVector3 pos) [[unsequenced]];
-cpVector2 cpCameraToScreenSpace(cpVector3 pos) [[unsequenced]];
+cpVector3 cpWorldToCameraSpace(cpVector3 pos) [[unsequenced]]; // Transform a point from world to camera space.
+cpVector2 cpCameraToScreenSpace(cpVector3 pos) [[unsequenced]]; // Transform a point from camera to screen space.
 
-void cpDrawMesh(cpMesh mesh, cpVector3 offset, cpMatrix3 transform, cpColor tint);
-void cpDrawPixel3d(cpVector3 pos, cpColor tint);
-void cpDrawLine3d(cpVector3 start, cpVector3 end, cpColor tint);
-void cpDrawCircle3d(cpVector3 center, fix16_t radius, cpColor tint);
+void cpDrawMesh(cpMesh mesh, cpVector3 offset, cpMatrix3 transform, cpColor tint); // Draw a mesh using a given transformation matrix.
+void cpDrawPixel3d(cpVector3 pos, cpColor tint); // Draw a 3d pixel.
+void cpDrawLine3d(cpVector3 start, cpVector3 end, cpColor tint); // Draw a 3d line.
+void cpDrawCircle3d(cpVector3 center, fix16_t radius, cpColor tint); // Draw a 3d circle.
+
+#endif
 
 // collision detection functions (very bad)
-bool cpCheckCollisionLines(cpVector2i start1, cpVector2i end1, cpVector2i start2, cpVector2i end2, cpVector2i* collisionPoint);
+
+bool cpCheckCollisionLines(cpVector2i start1, cpVector2i end1, cpVector2i start2, cpVector2i end2, cpVector2i* collisionPoint); // Check if two lines collide. If yes, store the collision point.
 
 // input functions
-bool cpIsKeyDown(cpKeyIndices keyIdx) [[unsequenced]];
-bool cpIsKeyPressed(cpKeyIndices keyIdx) [[unsequenced]];
-bool cpIsKeyUp(cpKeyIndices keyIdx) [[unsequenced]];
-bool cpIsKeyReleased(cpKeyIndices keyIdx) [[unsequenced]];
+
+bool cpIsKeyDown(cpKeyIndices keyIdx) [[unsequenced]]; // Is a key down?
+bool cpIsKeyPressed(cpKeyIndices keyIdx) [[unsequenced]]; // Has a key just been pressed?
+bool cpIsKeyUp(cpKeyIndices keyIdx) [[unsequenced]]; // Is a key up?
+bool cpIsKeyReleased(cpKeyIndices keyIdx) [[unsequenced]]; // Has a key just been released?
 
 
 #endif //CPLIB_CPLIB_H

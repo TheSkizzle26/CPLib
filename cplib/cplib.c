@@ -3,12 +3,12 @@
 //
 
 
+#include <stdint.h>
+#include <stdbool.h>
 #include "cplib.h"
 #include "common.h"
 #include "vector.h"
 #include "matrix.h"
-#include <stdint.h>
-#include <stdbool.h>
 
 #ifdef TARGET_PC
 #include <stdlib.h>
@@ -580,6 +580,8 @@ void cpDrawTexture(const cpTexture texture, const int x, const int y) {
     }
 }
 
+#ifdef CPLIB_ENABLE_3D
+
 void cpRegisterCamera3d(const cpCamera3d camera) {
     internalCamera3d.position = camera.position;
 
@@ -742,6 +744,8 @@ void cpDrawCircle3d(const cpVector3 center, const fix16_t radius, const cpColor 
         tint
     );
 }
+
+#endif
 
 static int pointOrientation(cpVector2i a, cpVector2i b, cpVector2i c) {
     return (b.x - a.x) * (c.y - a.y) - (b.y - a.y) * (c.x - a.x);

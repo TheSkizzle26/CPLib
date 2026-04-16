@@ -8,7 +8,7 @@ C_VERSION := c23
 OPTIMIZATION_LEVEL := O3 # don't go lower than O1 (compilation errors!)
 
 # enable some features here (for example -DCPLIB_ENABLE_MATRIX4)
-CPLIB_FEATURES :=
+CPLIB_FEATURES := -DCPLIB_ENABLE_3D
 
 C_PC := gcc
 C_PC_FLAGS := -W -Wall -DTARGET_PC -lraylib -std=$(C_VERSION) -$(OPTIMIZATION_LEVEL) $(FIXPOINT_DEFS) $(CPLIB_FEATURES)

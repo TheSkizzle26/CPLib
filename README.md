@@ -14,8 +14,10 @@ If you want to run this on your PC, you will need to have raylib installed.
 - very similar to raylib
 - 2d and 3d rendering
 - shape drawing
-- vector arithmetic
+- vectors
+- matrices
 - also includes libfixmath for float vectors
+- lots of features are toggleable for smaller binaries
 
 # A simple example
 ```C
@@ -44,13 +46,16 @@ int main() {
 Some features are disabled by default. Enable them by adding the appropriate definition
 in your makefile.
 
+**CPLIB_ENABLE_3D:** Enable all 3d-related functionality.\
 **CPLIB_ENABLE_VECTOR3I:** Enable cpVector3i struct and arithmetic functions.\
 **CPLIB_ENABLE_VECTOR4:** Enable cpVector4 struct and arithmetic functions.\
-**CPLIB_ENABLE_MATRIX4:** Enable cpMatrix4 struct and arithmetic functions. *Automatically enables vector4 as well*.\
-**CPLIB_ENABLE_NOFRAMEBUF:** Write to VRAM instead of separate frame buffer. cpGetFramebuffer() will the VRAM address.
+**CPLIB_ENABLE_MATRIX4:** Enable cpMatrix4 struct and arithmetic functions.\
+**CPLIB_ENABLE_NOFRAMEBUF:** Write to VRAM instead of separate frame buffer. cpGetFramebuffer() will return the VRAM address. Might be a bit slower but will save a lot of RAM.
+
+You might need to define these before including cplib.h in order for your IDE to recognize it.
 
 # TODOs:
-- **use vectors for rendering instead of yaw and pitch**
 - add CALC_* prefix to cmt, power, etc.
-- use dmac for rendering
-- add clipping for some rendering functions
+- Lower binary size.
+- Add file related functions.
+- Add text rendering.

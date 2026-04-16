@@ -9,6 +9,12 @@
  * just copy the cplib folder to your project and take a look
  * at this example script. You may also want to copy linker.ld and Makefile.
  */
+
+// so my IDE doesn't hate me
+#ifndef CPLIB_ENABLE_3D
+#define CPLIB_ENABLE_3D
+#endif
+
 #include "cplib/cplib.h"
 
 APP_NAME("CPLib test")
@@ -203,6 +209,8 @@ void render() {
         },
         CP_RED
     );
+
+    cpDrawText("Hello world!", 0, 0, CP_WHITE);
 
     cpEndDrawing();
 }
