@@ -210,7 +210,7 @@ void render() {
 
 int main() {
     cpInit();
-    cpSetTargetFPS(20);
+    // cpSetTargetFPS(20);
     cpSetOverclock(CP_OC_MUL_48);
 
     init();

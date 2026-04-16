@@ -35,10 +35,9 @@ HOLLYHOCK_SECTION_STRING(version, app_version)
 
 
 #ifndef TARGET_PC
-#include "memcpy.h"
 void free(void* ptr);
 void* malloc(size_t size);
-// void* memcpy(void* destination, const void* source, size_t num);
+void* memcpy(void* destination, const void* source, size_t num);
 void* memset(void* ptr, int value, size_t num);
 #endif
 
@@ -161,13 +160,13 @@ void cpSetOverclock(cpOverclockMultipliers mul);
 
 // utilities
 
-cpColor cpRGBToColor(uint8_t r, uint8_t g, uint8_t b);
-void cpVector3ToAngles(cpVector3 v, fix16_t* yaw, fix16_t* pitch);
-cpVector3 cpAnglesToVector3(fix16_t yaw, fix16_t pitch);
+cpColor cpRGBToColor(uint8_t r, uint8_t g, uint8_t b) [[unsequenced]];
+void cpVector3ToAngles(cpVector3 v, fix16_t* yaw, fix16_t* pitch) [[unsequenced]];
+cpVector3 cpAnglesToVector3(fix16_t yaw, fix16_t pitch) [[unsequenced]];
 
-int cpGetScreenWidth();
-int cpGetScreenHeight();
-uint16_t* cpGetFramebuffer(); // squeeze out that last bit of performance
+int cpGetScreenWidth() [[unsequenced]];
+int cpGetScreenHeight() [[unsequenced]];
+uint16_t* cpGetFramebuffer() [[unsequenced]]; // squeeze out that last bit of performance
 
 // 2d drawing functions
 
@@ -185,11 +184,11 @@ void cpDrawTexture(cpTexture texture, int x, int y);
 // 3d drawing functions
 
 void cpRegisterCamera3d(cpCamera3d camera);
-cpVector3 cpGetCamera3dDirection(cpCamera3d camera);
+cpVector3 cpGetCamera3dDirection(cpCamera3d camera) [[unsequenced]];
 void cpSetCamera3dDirection(cpCamera3d* camera, cpVector3 rotation);
 
-cpVector3 cpWorldToCameraSpace(cpVector3 pos);
-cpVector2 cpCameraToScreenSpace(cpVector3 pos);
+cpVector3 cpWorldToCameraSpace(cpVector3 pos) [[unsequenced]];
+cpVector2 cpCameraToScreenSpace(cpVector3 pos) [[unsequenced]];
 
 void cpDrawMesh(cpMesh mesh, cpVector3 offset, cpMatrix3 transform, cpColor tint);
 void cpDrawPixel3d(cpVector3 pos, cpColor tint);
@@ -200,10 +199,10 @@ void cpDrawCircle3d(cpVector3 center, fix16_t radius, cpColor tint);
 bool cpCheckCollisionLines(cpVector2i start1, cpVector2i end1, cpVector2i start2, cpVector2i end2, cpVector2i* collisionPoint);
 
 // input functions
-bool cpIsKeyDown(cpKeyIndices keyIdx);
-bool cpIsKeyPressed(cpKeyIndices keyIdx);
-bool cpIsKeyUp(cpKeyIndices keyIdx);
-bool cpIsKeyReleased(cpKeyIndices keyIdx);
+bool cpIsKeyDown(cpKeyIndices keyIdx) [[unsequenced]];
+bool cpIsKeyPressed(cpKeyIndices keyIdx) [[unsequenced]];
+bool cpIsKeyUp(cpKeyIndices keyIdx) [[unsequenced]];
+bool cpIsKeyReleased(cpKeyIndices keyIdx) [[unsequenced]];
 
 
 #endif //CPLIB_CPLIB_H

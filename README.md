@@ -44,9 +44,10 @@ int main() {
 Some features are disabled by default. Enable them by adding the appropriate definition
 in your makefile.
 
-**CPLIB_IMPLEMENT_VECTOR3I:** Implement cpVector3i struct and arithmetic functions.\
-**CPLIB_IMPLEMENT_VECTOR4:** Implement cpVector4 struct and arithmetic functions.\
-**CPLIB_IMPLEMENT_MATRIX4:** Implement cpMatrix4 struct and arithmetic functions. *Automatically enables vector4 as well*.
+**CPLIB_ENABLE_VECTOR3I:** Enable cpVector3i struct and arithmetic functions.\
+**CPLIB_ENABLE_VECTOR4:** Enable cpVector4 struct and arithmetic functions.\
+**CPLIB_ENABLE_MATRIX4:** Enable cpMatrix4 struct and arithmetic functions. *Automatically enables vector4 as well*.\
+**CPLIB_ENABLE_NOFRAMEBUF:** Write to VRAM instead of separate frame buffer. cpGetFramebuffer() will the VRAM address.
 
 # TODOs:
 - **use vectors for rendering instead of yaw and pitch**

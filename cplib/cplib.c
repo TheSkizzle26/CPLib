@@ -18,7 +18,6 @@
 #include "cpg.h"
 #include "cmt.h"
 #include "power.h"
-#include "memcpy.h"
 #endif
 
 
@@ -154,6 +153,8 @@ void cpInit() {
     rlTexture = rlwCreateTexture(screenWidth, screenHeight);
     rlPixelBuf = (uint8_t*)malloc(sizeof(uint8_t) * 4*numPixels);
     memset(rlPixelBuf, 0, (int)sizeof(uint8_t) * 4*numPixels);
+
+    pixelBuf = (cpColor*)malloc(sizeof(cpColor) * numPixels);
 #else
     // init lcd
     CALC_LCD_GetSize(&screenWidth, &screenHeight);
@@ -161,9 +162,14 @@ void cpInit() {
     calcVRAM = CALC_LCD_GetVRAMAddress();
     CALC_LCD_VRAMBackup();
 
+#ifdef CPLIB_ENABLE_NOFRAMEBUF
+    pixelBuf = calcVRAM;
+#else
+    pixelBuf = (cpColor*)malloc(sizeof(cpColor) * numPixels);
 #endif
 
-    pixelBuf = (cpColor*)malloc(sizeof(cpColor) * numPixels);
+#endif
+
     memset(pixelBuf, 0, (int)sizeof(cpColor) * numPixels);
     cpSetTargetFPS(0);
 
@@ -181,6 +187,7 @@ void cpInit() {
 void cpQuit() {
 #ifdef TARGET_PC
     rlwCloseWindow();
+    free(pixelBuf);
 #else
     // reset clock speed
     cpg_set_pll_mul(CP_OC_MUL_DEFAULT);
@@ -192,9 +199,12 @@ void cpQuit() {
     // stop timers
     cmt_stop();
     POWER_MSTPCR0->CMT = 1;
+
+#ifndef CPLIB_ENABLE_NOFRAMEBUF
+    free(pixelBuf);
 #endif
 
-    free(pixelBuf);
+#endif
 }
 
 void cpSetTargetFPS(const int value) {
@@ -313,7 +323,10 @@ void cpEndDrawing() {
     rlwSetWindowTitle(title);
 #else
     // draw pixel buffer
+#ifndef CPLIB_ENABLE_NOFRAMEBUF
     memcpy(calcVRAM, pixelBuf, (int)sizeof(uint16_t) * numPixels);
+#endif
+
     CALC_LCD_Refresh();
 
     // fetch key states

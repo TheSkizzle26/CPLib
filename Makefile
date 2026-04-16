@@ -1,42 +1,27 @@
+# modified makefile originally from SnailMath's hollyhock-2 example makefile.
+
 APP_NAME:=cplib_test
 
-#This Makefile compiles a program for the calculator running hollyhock-2 and for the pc.
-#You need the hollyhock sdk for the calculator version and sdl2 for the pc version.
-# github.com/SnailMath/hollyhock-2
-#export SDK_DIR:=/path/to/the/folder/hollyhock-2/sdk/
-
-
-#you can use 'make all' to compile all and 'make clean' to remove the output files.
-#you can compile only the pc version with 'make pc' (you won't need hollyhock)
-#or only the calculator version with 'make hhk' (you won't need sdl for this)
-
-
-#this makefile is based on the makefile in app_tamplate from the original hollyhock project by The6P4C
-
-
-#ifndef SDK_DIR
-#$(error You need to define the SDK_DIR environment variable, and point it to the sdk/ folder)
-#endif
-
-#If you use AS sources make sure to write the same functions in C++ because sh4 as does not run on the pc
-#The pc compiler
 FIXPOINT_DEFS := -DFIXMATH_NO_CACHE -DFIXMATH_NO_CTYPE -DFIXMATH_NO_HARD_DIVISION -DFIXMATH_NO_64BIT # -DFIXMATH_FAST_SIN (excluded to not make 3d camera jitter)
 
-# enable some features here (for example -DCPLIB_IMPLEMENT_MATRIX4)
+C_VERSION := c23
+OPTIMIZATION_LEVEL := O3 # don't go lower than O1 (compilation errors!)
+
+# enable some features here (for example -DCPLIB_ENABLE_MATRIX4)
 CPLIB_FEATURES :=
 
 C_PC := gcc
-C_PC_FLAGS := -W -Wall -DTARGET_PC -lraylib $(FIXPOINT_DEFS) $(CPLIB_FEATURES)
+C_PC_FLAGS := -W -Wall -DTARGET_PC -lraylib $(OPTIMIZE_FLAGS) $(FIXPOINT_DEFS) $(CPLIB_FEATURES)
 
 #The sh4 assembler, compiler and linker:
 AS := sh4-elf-as
 AS_FLAGS :=
 
 CC := sh4-elf-gcc
-CC_FLAGS := -ffreestanding -fshort-wchar -Wall -Wextra -O2 -fno-builtin-memcpy $(FIXPOINT_DEFS) $(CPLIB_FEATURES)
+CC_FLAGS := -ffreestanding -fshort-wchar -Wall -Wextra -fno-builtin-memcpy -std=$(C_VERSION) -$(OPTIMIZATION_LEVEL) $(FIXPOINT_DEFS) $(CPLIB_FEATURES)
 
 CXX := sh4-elf-g++
-CXX_FLAGS := -ffreestanding -fno-exceptions -fno-rtti -fshort-wchar -Wall -Wextra -O2 -fno-builtin-memcpy $(FIXPOINT_DEFS) $(CPLIB_FEATURES)
+CXX_FLAGS := -ffreestanding -fno-exceptions -fno-rtti -fshort-wchar -Wall -Wextra -fno-builtin-memcpy -std=$(C_VERSION) -$(OPTIMIZATION_LEVEL) $(FIXPOINT_DEFS) $(CPLIB_FEATURES)
 
 LD := sh4-elf-gcc
 LD_FLAGS := -nostartfiles -nostdlib
