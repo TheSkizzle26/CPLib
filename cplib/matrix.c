@@ -3,7 +3,7 @@
 #include "matrix.h"
 
 
-cpMatrix3 cpMatrix3CreateIdentity() {
+cpMatrix3 cpMatrix3CreateIdentity() [[unsequenced]] {
     return (cpMatrix3) {
         fix16_one,  0,          0,
         0,          fix16_one,  0,
@@ -11,7 +11,7 @@ cpMatrix3 cpMatrix3CreateIdentity() {
     };
 }
 
-cpMatrix3 cpMatrix3CreateScalar(const fix16_t value) {
+cpMatrix3 cpMatrix3CreateScalar(const fix16_t value) [[unsequenced]] {
     return (cpMatrix3) {
         value,      0,          0,
         0,          value,  0,
@@ -19,7 +19,7 @@ cpMatrix3 cpMatrix3CreateScalar(const fix16_t value) {
     };
 }
 
-cpMatrix3 cpMatrix3CreateRotation(cpVector3 direction) {
+cpMatrix3 cpMatrix3CreateRotation(const cpVector3 direction) [[unsequenced]] {
     const cpVector3 right = cpVector3Normalize(cpVector3CrossProduct((cpVector3) {0, fix16_one, 0}, direction));
     const cpVector3 up = cpVector3CrossProduct(direction, right);
 
@@ -30,7 +30,7 @@ cpMatrix3 cpMatrix3CreateRotation(cpVector3 direction) {
     };
 }
 
-cpMatrix3 cpMatrix3Transpose(cpMatrix3 A) {
+cpMatrix3 cpMatrix3Transpose(const cpMatrix3 A) [[unsequenced]] {
     return (cpMatrix3) {
         A.xx, A.yx, A.zx,
         A.xy, A.yy, A.zy,
@@ -38,7 +38,7 @@ cpMatrix3 cpMatrix3Transpose(cpMatrix3 A) {
     };
 }
 
-cpMatrix3 cpMatrix3Multiply(const cpMatrix3 A, const cpMatrix3 B) {
+cpMatrix3 cpMatrix3Multiply(const cpMatrix3 A, const cpMatrix3 B) [[unsequenced]] {
     cpMatrix3 C = {0};
 
     C.xx = fix16_add(fix16_add(fix16_mul(A.xx, B.xx), fix16_mul(A.xy, B.yx)), fix16_mul(A.xz, B.zx));
@@ -56,7 +56,7 @@ cpMatrix3 cpMatrix3Multiply(const cpMatrix3 A, const cpMatrix3 B) {
     return C;
 }
 
-cpVector3 cpMatrix3MultiplyVector(const cpMatrix3 A, const cpVector3 v) {
+cpVector3 cpMatrix3MultiplyVector(const cpMatrix3 A, const cpVector3 v) [[unsequenced]] {
     return (cpVector3) {
         fix16_add(fix16_add(fix16_mul(A.xx, v.x),  fix16_mul(A.xy, v.y)), fix16_mul(A.xz, v.z)),
         fix16_add(fix16_add(fix16_mul(A.yx, v.x),  fix16_mul(A.yy, v.y)), fix16_mul(A.yz, v.z)),
@@ -66,7 +66,7 @@ cpVector3 cpMatrix3MultiplyVector(const cpMatrix3 A, const cpVector3 v) {
 
 #ifdef CPLIB_IMPLEMENT_MATRIX4
 
-cpMatrix4 cpMatrix4CreateIdentity() {
+cpMatrix4 cpMatrix4CreateIdentity() [[unsequenced]] {
     return (cpMatrix4) {
         fix16_one,  0,          0,          0,
         0,          fix16_one,  0,          0,
@@ -75,7 +75,7 @@ cpMatrix4 cpMatrix4CreateIdentity() {
     };
 }
 
-cpMatrix4 cpMatrix4CreateIdentity(const fix16_t value) {
+cpMatrix4 cpMatrix4CreateScalar(const fix16_t value) [[unsequenced]] {
     return (cpMatrix4) {
         value,      0,          0,          0,
         0,          value,      0,          0,
@@ -84,7 +84,7 @@ cpMatrix4 cpMatrix4CreateIdentity(const fix16_t value) {
     };
 }
 
-cpMatrix4 cpMatrix4CreateRotation(cpVector3 direction) {
+cpMatrix4 cpMatrix4CreateRotation(const cpVector3 direction) [[unsequenced]] {
     const cpVector3 right = cpVector3Normalize(cpVector3CrossProduct((cpVector3) {0, fix16_one, 0}, direction));
     const cpVector3 up = cpVector3CrossProduct(direction, right);
 
@@ -96,7 +96,16 @@ cpMatrix4 cpMatrix4CreateRotation(cpVector3 direction) {
     };
 }
 
-cpMatrix4 cpMatrix4Multiply(const cpMatrix4 A, const cpMatrix4 B) {
+cpMatrix4 cpMatrix4Transpose(const cpMatrix4 A) [[unsequenced]] {
+    return (cpMatrix4) {
+        A.xx, A.yx, A.zx, A.wx,
+        A.xy, A.yy, A.zy, A.wy,
+        A.xz, A.yz, A.zz, A.wz,
+        A.xw, A.yw, A.zw, A.ww,
+    };
+}
+
+cpMatrix4 cpMatrix4Multiply(const cpMatrix4 A, const cpMatrix4 B) [[unsequenced]] {
     cpMatrix4 C = {0};
 
     // wtf...
@@ -125,7 +134,7 @@ cpMatrix4 cpMatrix4Multiply(const cpMatrix4 A, const cpMatrix4 B) {
     return C;
 }
 
-cpVector4 cpMatrix4MultiplyVector(const cpMatrix4 A, const cpVector4 v) {
+cpVector4 cpMatrix4MultiplyVector(const cpMatrix4 A, const cpVector4 v) [[unsequenced]] {
     return (cpVector4) {
         fix16_add(fix16_add(fix16_add(fix16_mul(A.xx, v.x), fix16_mul(A.xy, v.y)), fix16_mul(A.xz, v.z)), fix16_mul(A.xw, v.w)),
         fix16_add(fix16_add(fix16_add(fix16_mul(A.yx, v.x), fix16_mul(A.yy, v.y)), fix16_mul(A.yz, v.z)), fix16_mul(A.yw, v.w)),
