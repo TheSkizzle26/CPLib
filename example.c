@@ -210,8 +210,6 @@ void render() {
         CP_RED
     );
 
-    cpDrawText("Hello world!", 0, 0, CP_WHITE);
-
     cpEndDrawing();
 }
 
