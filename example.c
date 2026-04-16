@@ -37,7 +37,7 @@ void init() {
         CP_PIXEL_FORMAT_RGB565,
         malloc(sizeof(data))
     };
-    memset(texture.data, 0, sizeof(data));
+    // memset(texture.data, 0, sizeof(data));
     memcpy(texture.data, data, sizeof(data));
 
     texX = 100;

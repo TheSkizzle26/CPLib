@@ -35,9 +35,10 @@ HOLLYHOCK_SECTION_STRING(version, app_version)
 
 
 #ifndef TARGET_PC
+#include "memcpy.h"
 void free(void* ptr);
 void* malloc(size_t size);
-void* memcpy(void* destination, const void* source, size_t num);
+// void* memcpy(void* destination, const void* source, size_t num);
 void* memset(void* ptr, int value, size_t num);
 #endif
 

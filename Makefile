@@ -33,10 +33,10 @@ AS := sh4-elf-as
 AS_FLAGS :=
 
 CC := sh4-elf-gcc
-CC_FLAGS := -ffreestanding -fshort-wchar -Wall -Wextra -O2 $(FIXPOINT_DEFS) $(CPLIB_FEATURES)
+CC_FLAGS := -ffreestanding -fshort-wchar -Wall -Wextra -O2 -fno-builtin-memcpy $(FIXPOINT_DEFS) $(CPLIB_FEATURES)
 
 CXX := sh4-elf-g++
-CXX_FLAGS := -ffreestanding -fno-exceptions -fno-rtti -fshort-wchar -Wall -Wextra -O2 $(FIXPOINT_DEFS) $(CPLIB_FEATURES)
+CXX_FLAGS := -ffreestanding -fno-exceptions -fno-rtti -fshort-wchar -Wall -Wextra -O2 -fno-builtin-memcpy $(FIXPOINT_DEFS) $(CPLIB_FEATURES)
 
 LD := sh4-elf-gcc
 LD_FLAGS := -nostartfiles -nostdlib
@@ -67,8 +67,9 @@ clean:
 $(APP_PC):  $(CC_SOURCES) $(CXX_SOURCES) $(H_INC) $(HPP_INC)
 	$(C_PC) $(CC_SOURCES) $(CXX_SOURCES) -o $(APP_PC) $(C_PC_FLAGS)
 
-$(APP_ELF): $(OBJECTS) $(SDK_DIR)/sdk.o linker.ld
-	$(LD) -T linker.ld -o $@ $(LD_FLAGS) $(OBJECTS) $(SDK_DIR)/sdk.o
+# used to be $(SDK_DIR)/sdk.o before linker.ld and after objects
+$(APP_ELF): $(OBJECTS) linker.ld
+	$(LD) -T linker.ld -o $@ $(LD_FLAGS) $(OBJECTS)
 	$(OBJCOPY) --set-section-flags .hollyhock_name=contents,strings,readonly $(APP_ELF) $(APP_ELF)
 	$(OBJCOPY) --set-section-flags .hollyhock_description=contents,strings,readonly $(APP_ELF) $(APP_ELF)
 	$(OBJCOPY) --set-section-flags .hollyhock_author=contents,strings,readonly $(APP_ELF) $(APP_ELF)

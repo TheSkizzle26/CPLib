@@ -18,6 +18,7 @@
 #include "cpg.h"
 #include "cmt.h"
 #include "power.h"
+#include "memcpy.h"
 #endif
 
 
