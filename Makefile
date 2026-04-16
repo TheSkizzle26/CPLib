@@ -11,7 +11,7 @@ OPTIMIZATION_LEVEL := O3 # don't go lower than O1 (compilation errors!)
 CPLIB_FEATURES :=
 
 C_PC := gcc
-C_PC_FLAGS := -W -Wall -DTARGET_PC -lraylib $(OPTIMIZE_FLAGS) $(FIXPOINT_DEFS) $(CPLIB_FEATURES)
+C_PC_FLAGS := -W -Wall -DTARGET_PC -lraylib -std=$(C_VERSION) -$(OPTIMIZATION_LEVEL) $(FIXPOINT_DEFS) $(CPLIB_FEATURES)
 
 #The sh4 assembler, compiler and linker:
 AS := sh4-elf-as
