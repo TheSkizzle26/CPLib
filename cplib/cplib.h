@@ -9,6 +9,7 @@
 #include "vector.h"
 #include "matrix.h"
 #include "rand.h"
+#include "file.h"
 
 
 #ifdef TARGET_PC
@@ -31,14 +32,6 @@ HOLLYHOCK_SECTION_STRING(description, app_description)
 HOLLYHOCK_SECTION_STRING(author, app_author)
 #define APP_VERSION(app_version) \
 HOLLYHOCK_SECTION_STRING(version, app_version)
-#endif
-
-
-#ifndef TARGET_PC
-void free(void* ptr);
-void* malloc(size_t size);
-void* memcpy(void* destination, const void* source, size_t num);
-void* memset(void* ptr, int value, size_t num);
 #endif
 
 

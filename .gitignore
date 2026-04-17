@@ -1,3 +1,4 @@
+storage_emulated/
 *.elf
 *.hhk
 **/*.o

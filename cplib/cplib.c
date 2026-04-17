@@ -155,6 +155,9 @@ void cpInit() {
     memset(rlPixelBuf, 0, (int)sizeof(uint8_t) * 4*numPixels);
 
     pixelBuf = (cpColor*)malloc(sizeof(cpColor) * numPixels);
+
+    // create emulated storage folder
+    cpMakeDirectory("");
 #else
     // init lcd
     CALC_LCD_GetSize(&screenWidth, &screenHeight);

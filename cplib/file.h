@@ -1,22 +1,34 @@
 #ifndef CPLIB_FILE_H
 #define CPLIB_FILE_H
 
-#include "common.h"
-
 #ifdef TARGET_PC
-#include <stdio.h>
-#define CP_ROOT_PATH "./emulated"
-#define CP_PATH_SEPERATOR = "/"
-#else
-#define CP_ROOT_PATH "\\\\fls0"
-#define CP_PATH_SEPERATOR = "\\"
-#endif
 
+#include <stdio.h>
+
+#define CP_ROOT_PATH "./storage_emulated"
+#define CP_SEPARATOR '/'
+
+// use the already existing macros
+#define CP_SEEK_START SEEK_SET
+#define CP_SEEK_CURRENT SEEK_CUR
+#define CP_SEEK_END SEEK_END
+
+#else
+
+#define CP_ROOT_PATH "\\fls0"
+#define CP_SEPARATOR '\\'
+
+#define CP_SEEK_START 0
+#define CP_SEEK_CURRENT 1
+#define CP_SEEK_END 2
+
+#endif
 
 typedef enum {
     CP_FILE_MODE_READ = 0,
-    CP_FILE_MODE_WRITE = 0,
+    CP_FILE_MODE_WRITE = 1,
 } cpFileModes;
+
 
 typedef struct {
 #ifdef TARGET_PC
@@ -26,29 +38,36 @@ typedef struct {
 #endif
 
     cpFileModes mode;
+    bool isInvalid; // can be used to check if the file's opened correctly
 } cpFile;
 
 
-cpFile cpFileOpen(char* path, cpFileModes mode);
+cpFile cpFileOpen(const char* path, cpFileModes mode);
 int cpFileClose(cpFile file);
-cpFile cpFileSeek(cpFile file, size_t position);
-int cpFileRead(cpFile file, size_t byteCount, char* buf);
-int cpFileWrite(cpFile file, char* buf);
+cpFile cpFileSeek(cpFile file, int position, int origin); // why does stdlib use int???
+int cpFileRead(cpFile file, int byteCount, char* buf);
+int cpFileWrite(cpFile file, int byteCount, const char* buf);
 
-bool cpFileExists(char* path);
-int cpFileCreate(char* path);
-int cpFileRemove(char* path);
-int cpFileCopy(char* path);
-int cpFileMove(char* path);
+bool cpFileExists(const char* path);
+int cpFileCreate(const char* path);
+int cpFileRemove(const char* path);
+int cpFileCopy(const char* srcPath, const char* destPath);
+int cpFileMove(const char* srcPath, const char* destPath);
 
-size_t cpGetFileLength(cpFile file);
-char* cpGetFileExtension(char* path);
-char* cpGetFileName(char* path);
-char* cpGetFileNameWithoutExt(char* path);
-char* cpGetDirectoryName(char* path);
+int cpGetFileLength(cpFile file);
+int cpGetFilePosition(cpFile file);
+char* cpGetFileExtension(const char* path);
+char* cpGetFileName(const char* path);
+char* cpGetFileNameWithoutExt(const char* path);
+char* cpGetDirectoryName(const char* path);
 
-int cpMakeDirectory(char* path);
-int cpChangeDirectory(char* path);
+char* cpCurrentDirectory();
+int cpMakeDirectory(const char* path);
+int cpChangeDirectory(const char* path);
 
+/*
+ * Maybe:
+ * - cpIsDirectory
+ */
 
 #endif
