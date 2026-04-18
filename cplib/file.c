@@ -546,3 +546,15 @@ int cpChangeDirectory(const char* path) {
     strcpy(currentDirectory, newPath);
     return 0;
 }
+
+bool cpIsDirectory(const char* path) {
+
+}
+
+void cpListDirectory(const char* path, cpListDirResult* result) {
+
+}
+
+void cpFreeListDirResult(cpListDirResult* result) {
+
+}

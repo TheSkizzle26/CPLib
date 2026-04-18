@@ -18,11 +18,11 @@
 
 #endif
 
+
 typedef enum {
     CP_FILE_MODE_READ = 0,
     CP_FILE_MODE_WRITE = 1,
 } cpFileModes;
-
 
 typedef struct {
 #ifdef TARGET_PC
@@ -34,6 +34,11 @@ typedef struct {
     cpFileModes mode;
     bool isInvalid; // can be used to check if the file's opened correctly
 } cpFile;
+
+typedef struct {
+    size_t count;
+    char** names;
+} cpListDirResult;
 
 
 cpFile cpFileOpen(const char* path, cpFileModes mode);
@@ -58,6 +63,9 @@ char* cpGetDirectoryName(const char* path);
 char* cpCurrentDirectory();
 int cpMakeDirectory(const char* path);
 int cpChangeDirectory(const char* path);
+bool cpIsDirectory(const char* path);
+void cpListDirectory(const char* path, cpListDirResult* result);
+void cpFreeListDirResult(cpListDirResult* result);
 
 /*
  * Maybe:
