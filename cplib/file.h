@@ -5,18 +5,12 @@
 
 #include <stdio.h>
 
-#define CP_ROOT_PATH "./storage_emulated"
-#define CP_SEPARATOR '/'
-
 // use the already existing macros
 #define CP_SEEK_START SEEK_SET
 #define CP_SEEK_CURRENT SEEK_CUR
 #define CP_SEEK_END SEEK_END
 
 #else
-
-#define CP_ROOT_PATH "\\fls0"
-#define CP_SEPARATOR '\\'
 
 #define CP_SEEK_START 0
 #define CP_SEEK_CURRENT 1

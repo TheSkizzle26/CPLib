@@ -9,10 +9,20 @@
 #include "file.h"
 
 #ifdef TARGET_PC
+
 #include <stdio.h>
 #include <sys/stat.h> // mkdir
 #include <stdlib.h>
 #include <string.h>
+
+#define BASE_PATH "./storage_emulated"
+#define OS_SEPARATOR '/'
+
+#else
+
+#define BASE_PATH "\\fls0"
+#define OS_SEPARATOR '\\'
+
 #endif
 
 
@@ -67,50 +77,32 @@ int CALC_FILE_stat(const char *path, calcStat *buf);
 int CALC_FILE_write(int fd, const void *buf, int count);
 
 
-#define BUF_SIZE 256
-static char currentDirectory[BUF_SIZE] = "";
+#define BUF_SIZE 128
+static char currentDirectory[BUF_SIZE] = "/";
 
 
-static void replaceSeparators(char* buf) {
-#ifdef TARGET_PC
+static void buildPath(char out[BUF_SIZE],
+                      const char* base,
+                      const char* cwd,
+                      const char* name) {
+    char temp[BUF_SIZE];
+    strcpy(temp, base);
 
-    for (int i = 0; i < strlen(buf); i++) {
-        if (buf[i] == '\\')
-            buf[i] = '/';
+    if (strcmp(cwd, "/") == 0) {
+        strcat(temp, "/");
+        strcat(temp, name);
+    } else {
+        strcat(temp, cwd);
+        strcat(temp, "/");
+        strcat(temp, name);
     }
 
-#else
-
-    for (int i = 0; i < strlen(buf); i++) {
-        if (buf[i] == '/')
-            buf[i] = '\\';
-    }
-
-#endif
-}
-
-static void replaceSeparatorsRegular(char* buf) {
-    if (!buf) return;
-
-    for (int i = 0; i < strlen(buf); i++) {
-        if (buf[i] == '\\')
-            buf[i] = '/';
-    }
-}
-
-static void getFullPath(char buf[BUF_SIZE], const char* path) {
-    char fullPath[BUF_SIZE] = CP_ROOT_PATH;
-    strcat(fullPath, currentDirectory);
-    strcat(fullPath, (char[]){CP_SEPARATOR, 0});
-    strcat(fullPath, path);
-
-    replaceSeparators(fullPath);
-    strcpy(buf, fullPath);
+    strcpy(out, temp);
 }
 
 cpFile cpFileOpen(const char* path, const cpFileModes mode) {
     char fullPath[BUF_SIZE];
-    getFullPath(fullPath, path);
+    buildPath(fullPath, BASE_PATH, currentDirectory, path);
 
 #ifdef TARGET_PC
 
@@ -212,7 +204,7 @@ int cpFileWrite(const cpFile file, const int byteCount, const char* buf) {
 
 bool cpFileExists(const char* path) {
     char fullPath[BUF_SIZE];
-    getFullPath(fullPath, path);
+    buildPath(fullPath, BASE_PATH, currentDirectory, path);
 
 #ifdef TARGET_PC
 
@@ -235,7 +227,7 @@ bool cpFileExists(const char* path) {
 
 int cpFileCreate(const char* path) {
     char fullPath[BUF_SIZE];
-    getFullPath(fullPath, path);
+    buildPath(fullPath, BASE_PATH, currentDirectory, path);
 
 #ifdef TARGET_PC
 
@@ -257,7 +249,7 @@ int cpFileCreate(const char* path) {
 
 int cpFileRemove(const char* path) {
     char fullPath[BUF_SIZE];
-    getFullPath(fullPath, path);
+    buildPath(fullPath, BASE_PATH, currentDirectory, path);
 
 #ifdef TARGET_PC
 
@@ -336,7 +328,7 @@ char* cpGetFileExtension(const char* path) {
     // find last separator
     int separatorIdx = 0;
     for (int i = pathLength-1; i >= 0; i--) {
-        if (path[i] == CP_SEPARATOR) {
+        if (path[i] == '/') {
             separatorIdx = i;
             break;
         }
@@ -360,7 +352,7 @@ char* cpGetFileExtension(const char* path) {
         // return empty string
         char* ret = malloc(sizeof(char));
         if (!ret) return ret;
-        ret[0] = 0;
+        ret[0] = '\0';
         return ret;
     }
 
@@ -377,7 +369,7 @@ char* cpGetFileName(const char* path) {
     // find last separator
     int separatorIdx = 0;
     for (int i = pathLength-1; i >= 0; i--) {
-        if (path[i] == CP_SEPARATOR) {
+        if (path[i] == '/') {
             separatorIdx = i;
             break;
         }
@@ -395,7 +387,7 @@ char* cpGetFileNameWithoutExt(const char* path) {
     // find last separator
     int separatorIdx = 0;
     for (int i = pathLength-1; i >= 0; i--) {
-        if (path[i] == CP_SEPARATOR) {
+        if (path[i] == '/') {
             separatorIdx = i;
             break;
         }
@@ -427,7 +419,7 @@ char* cpGetFileNameWithoutExt(const char* path) {
     if (!nameNoExt) return nameNoExt;
 
     memcpy(nameNoExt, name, sizeof(char) * dotIdx);
-    nameNoExt[dotIdx] = 0;
+    nameNoExt[dotIdx] = '\0';
     return nameNoExt;
 }
 
@@ -436,7 +428,7 @@ char* cpGetDirectoryName(const char* path) {
 
     int separatorIdx = 0;
     for (int i = pathLength-1; i >= 0; i--) {
-        if (path[i] == CP_SEPARATOR) {
+        if (path[i] == '/') {
             separatorIdx = i;
             break;
         }
@@ -446,20 +438,19 @@ char* cpGetDirectoryName(const char* path) {
     if (!dirName) return dirName;
 
     memcpy(dirName, path, separatorIdx);
-    dirName[separatorIdx] = 0;
+    dirName[separatorIdx] = '\0';
     return dirName;
 }
 
 char* cpCurrentDirectory() {
-    char* ret = malloc(sizeof(char) * BUF_SIZE);
+    char* ret = malloc(sizeof(char) * (strlen(currentDirectory)+1));
     strcpy(ret, currentDirectory);
-    replaceSeparatorsRegular(ret);
     return ret;
 }
 
 int cpMakeDirectory(const char* path) {
     char fullPath[BUF_SIZE];
-    getFullPath(fullPath, path);
+    buildPath(fullPath, BASE_PATH, currentDirectory, path);
 
 #ifdef TARGET_PC
 
@@ -472,44 +463,86 @@ int cpMakeDirectory(const char* path) {
 #endif
 }
 
-int cpChangeDirectory(const char* path) {
-    char rem[BUF_SIZE];
-    strcpy(rem, path);
-    replaceSeparators(rem);
+static void removeLastSegment(char path[BUF_SIZE]) {
+    int length = strlen(path);
 
-    int remLength = strlen(path);
-    if (rem[remLength-1] == '.' && rem[remLength-2] == '.') {
-#ifdef TARGET_PC
-        strcat(rem, "/");
-#else
-        strcat(rem, "\\");
-#endif
-        remLength++;
+    if (length <= 1) { // root (e.g. "/")
+        path[0] = '/';
+        path[1] = '\0';
+        return;
     }
 
-    // move upwards (../)
-    while (remLength >= 3 && rem[0] == '.' && rem[1] == '.' && rem[2] == CP_SEPARATOR) {
-        int separatorIdx = 0;
-        for (int i = strlen(currentDirectory)-1; i >= 0; i--) {
-            if (currentDirectory[i] == CP_SEPARATOR) {
-                separatorIdx = i;
-                break;
+    // remove trailing "/"
+    if (path[length-1] == '/') {
+        path[length-1] = '\n';
+        length--;
+    }
+
+    // find last "/"
+    int i;
+    for (i = length-1; i >= 0; i--) {
+        if (path[i] == '/')
+            break;
+    }
+
+    if (i <= 0) {
+        // go to root
+        path[0] = '/';
+        path[1] = '\0';
+    } else {
+        path[i] = '\0';
+    }
+}
+
+static void appendSegment(char path[BUF_SIZE], char segment[BUF_SIZE]) {
+    if (strcmp(path, "/") != 0) {
+        strcat(path, "/");
+    }
+    strcat(path, segment);
+}
+
+int cpChangeDirectory(const char* path) {
+    char newPath[BUF_SIZE];
+    char token[BUF_SIZE];
+
+    if (path[0] == '/')
+        strcpy(newPath, "/");
+    else
+        strcpy(newPath, currentDirectory);
+
+    int i = 0;
+    int t = 0;
+
+    while (true) {
+        const char c = path[i];
+
+        if (c == '/' || c == '\0') {
+            token[t] = '\0';
+
+            if (t > 0) {
+                if (strcmp(token, ".") == 0) {
+                    // do nothing
+                } else if (strcmp(token, "..") == 0) {
+                    removeLastSegment(newPath);
+                } else {
+                    appendSegment(newPath, token);
+                }
             }
+
+            t = 0;
+            if (c == '\0')
+                break;
+        } else {
+            token[t++] = c;
         }
 
-        currentDirectory[separatorIdx] = 0;
-
-        // shift rem three to left
-        for (int i = 0; i < remLength-3; i++)
-            rem[i] = rem[i+3];
-        remLength -= 3;
-        rem[remLength] = 0;
+        i++;
     }
 
-    // move downwards
-    const char sep[] = {CP_SEPARATOR, 0};
-    strcat(currentDirectory, sep);
-    strcat(currentDirectory, rem);
+    // root if empty
+    if (strlen(newPath) == 0)
+        strcpy(newPath, "/");
 
+    strcpy(currentDirectory, newPath);
     return 0;
 }

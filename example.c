@@ -112,7 +112,7 @@ void init() {
     cpFileClose(file);
     cpFileMove("test", "copy");
 
-    cpChangeDirectory("../../CPLibTest");
+    cpChangeDirectory("../CPLibTest"); // does nothing if working correctly
     cpMakeDirectory("testDir");
 }
 
