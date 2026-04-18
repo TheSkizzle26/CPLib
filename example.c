@@ -1,13 +1,6 @@
 /*
- * Basically just raylib for the classpad II.
- * Can't do much at the moment.
- * Edit: can actually do quite a bit now.
- *
- * Also doesn't require the hollyhock-2 SDK, as it is included in this lib.
- *
- * If you would like to use this in another project,
- * just copy the cplib folder to your project and take a look
- * at this example script. You may also want to copy linker.ld and Makefile.
+ * This example file showcases basically
+ * all the functionality in this library.
  */
 
 // so my IDE doesn't hate me

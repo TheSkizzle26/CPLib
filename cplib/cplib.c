@@ -158,7 +158,9 @@ void cpInit() {
     pixelBuf = (cpColor*)malloc(sizeof(cpColor) * numPixels);
 
     // create emulated storage folder
+#ifdef CPLIB_ENABLE_FILE
     cpMakeDirectory("");
+#endif
 #else
     // init lcd
     CALC_LCD_GetSize(&screenWidth, &screenHeight);
@@ -188,8 +190,10 @@ void cpInit() {
     );
 
     // load default font
+#ifdef CPLIB_ENABLE_FONT
     cpDefaultFontInit();
     cpLoadDefaultFont();
+#endif
 }
 
 void cpQuit() {
