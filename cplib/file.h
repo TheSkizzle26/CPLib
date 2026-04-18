@@ -43,32 +43,32 @@ typedef struct {
 } cpListDirResult;
 
 
-cpFile cpFileOpen(const char* path, cpFileModes mode);
-int cpFileClose(cpFile file);
-cpFile cpFileSeek(cpFile file, int position, int origin); // why does stdlib use int???
-int cpFileRead(cpFile file, int byteCount, char* buf);
-int cpFileWrite(cpFile file, int byteCount, const char* buf);
+cpFile cpFileOpen(const char* path, cpFileModes mode); // Open a file.
+int cpFileClose(cpFile file); // Close an open file.
+cpFile cpFileSeek(cpFile file, int position, int origin); // Move to a specific position inside a file.
+int cpFileRead(cpFile file, int byteCount, char* buf); // Read a specific amount of bytes from a file.
+int cpFileWrite(cpFile file, int byteCount, const char* buf); // Write some bytes to a file.
 
-bool cpFileExists(const char* path);
-int cpFileCreate(const char* path);
-int cpFileRemove(const char* path);
-int cpFileCopy(const char* srcPath, const char* destPath);
-int cpFileMove(const char* srcPath, const char* destPath);
+bool cpFileExists(const char* path); // Check if a file exists.
+int cpFileCreate(const char* path); // Create a file.
+int cpFileRemove(const char* path); // Remove a file.
+int cpFileCopy(const char* srcPath, const char* destPath); // Copy a file to a new path.
+int cpFileMove(const char* srcPath, const char* destPath); // Move a file to a new path.
 
-int cpGetFileLength(cpFile file);
-int cpGetFilePosition(cpFile file);
-char* cpGetFileExtension(const char* path);
-char* cpGetFileName(const char* path);
-char* cpGetFileNameWithoutExt(const char* path);
-char* cpGetDirectoryPath(const char* path);
+int cpGetFileLength(cpFile file); // Get a file's length in bytes.
+int cpGetFilePosition(cpFile file); // Get the current position inside a file.
+char* cpGetFileExtension(const char* path); // Get a file's extension, for example ".txt".
+char* cpGetFileName(const char* path); // Get a file's name, for example "file.txt".
+char* cpGetFileNameWithoutExt(const char* path); // Get a file's name without the extension, for example "file".
+char* cpGetDirectoryPath(const char* path); // Get the specified path without the file name.
 
-char* cpCurrentDirectory();
-int cpMakeDirectory(const char* path);
-int cpChangeDirectory(const char* path);
-bool cpIsDirectory(const char* path);
-bool cpIsFile(const char* path);
-void cpListDirectory(const char* path, cpListDirResult* result);
-void cpFreeListDirResult(cpListDirResult* result);
+char* cpCurrentDirectory(); // Get the current working directory.
+int cpMakeDirectory(const char* path); // Create a directory.
+int cpChangeDirectory(const char* path); // Change the current working directory.
+bool cpIsDirectory(const char* path); // Check if a path is a directory;
+bool cpIsFile(const char* path); // Check if a path is a file.
+void cpListDirectory(const char* path, cpListDirResult* result); // List the contents of a directory. Call cpFreeListDirResults() once done with the results.
+void cpFreeListDirResult(cpListDirResult* result); // Free the results of cpListDirectory().
 
 #endif
 
