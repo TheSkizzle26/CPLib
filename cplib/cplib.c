@@ -7,6 +7,7 @@
 #include <stdbool.h>
 #include "cplib.h"
 #include "common.h"
+#include "font.h"
 #include "vector.h"
 #include "matrix.h"
 
@@ -185,6 +186,10 @@ void cpInit() {
         fix16_from_int(1),
         fix16_from_int(100)
     );
+
+    // load default font
+    cpDefaultFontInit();
+    cpLoadFont(cpDefaultFont);
 }
 
 void cpQuit() {

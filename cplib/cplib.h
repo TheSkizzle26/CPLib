@@ -6,10 +6,12 @@
 #define CPLIB_CPLIB_H
 
 #include "common.h"
+#include "rect.h"
 #include "vector.h"
 #include "matrix.h"
 #include "rand.h"
 #include "file.h"
+#include "font.h"
 
 
 #ifdef TARGET_PC
