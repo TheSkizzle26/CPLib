@@ -1,10 +1,3 @@
-/*
- * Hopefully I'll never have to touch this code again.
- * Interestingly, the current dir stuff works due to
- * a bunch of coincidences in the other functions.
- */
-
-
 #include "common.h"
 #include "file.h"
 
@@ -96,6 +89,13 @@ static void buildPath(char out[BUF_SIZE],
         strcat(temp, "/");
         strcat(temp, name);
     }
+
+#ifndef TARGET_PC
+    for (int i = 0; i < strlen(temp); i++) {
+        if (temp[i] == '/')
+            temp[i] = '\\';
+    }
+#endif
 
     strcpy(out, temp);
 }

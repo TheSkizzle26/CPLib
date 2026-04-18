@@ -99,21 +99,6 @@ void init() {
     camera = (cpCamera3d) {0};
     camera.position.y = fix16_from_int(2);
     camera.fovY = fix16_from_int(90);
-
-    // file system test
-    // Crash somewhere in here
-    cpMakeDirectory("CPLibTest");
-    cpChangeDirectory("CPLibTest");
-    const cpFile file = cpFileOpen("test", CP_FILE_MODE_WRITE);
-
-    const char buf[] = "Hello, world!";
-    cpFileWrite(file, strlen(buf)+1, buf);
-
-    cpFileClose(file);
-    cpFileMove("test", "copy");
-
-    cpChangeDirectory("../CPLibTest"); // does nothing if working correctly
-    cpMakeDirectory("testDir");
 }
 
 void update() {
