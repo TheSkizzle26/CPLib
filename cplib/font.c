@@ -1,10 +1,17 @@
+/*
+ * Horribly optimized font rendering.
+ */
+
+
 #include "common.h"
 #include "font.h"
 #include "cplib.h"
 
 
+#ifdef CPLIB_ENABLE_FONT
+
 static cpFont currentFont;
-cpFont cpDefaultFont;
+static cpFont defaultFont;
 
 
 void cpDefaultFontInit() {
@@ -62,80 +69,102 @@ void cpDefaultFontInit() {
                             6, 6, 6, 6, 6, 6, 7, 6, 6, 6, 6, 6, 3, 3, 3, 3, 7, 6, 6, 6, 6, 6, 6, 5, 6, 6, 6, 6, 6, 6, 4, 6,
                             5, 5, 5, 5, 5, 5, 9, 5, 5, 5, 5, 5, 2, 2, 3, 3, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 3, 5 };
 
-    cpDefaultFont = (cpFont) {
+    defaultFont = (cpFont) {
         10,
         1,
-        '!',
+        '!'-1,
         224,
         malloc(224 * sizeof(cpFontGlyph))
     };
 
-    cpFontGlyph glyphs[cpDefaultFont.glyphCount];
+    cpFontGlyph glyphs[defaultFont.glyphCount];
 
-    int curX = 0;
-    int curY = 0;
-    for (int i = 0; i < cpDefaultFont.glyphCount; i++) {
-        const int numBits = (charsWidth[i] * cpDefaultFont.baseSize);
+    // why does this work...
+    // raylib stores it very weirdly
+
+    int curLine = 0;
+    int curX = 1;
+    int testX = 1;
+    for (int i = 0; i < defaultFont.glyphCount; i++) {
+        bool overflow = false;
+
+        int curY = (1 + curLine * (defaultFont.baseSize + 1));
+        const int curWidth = charsWidth[i];
+
+        testX += curWidth + 1;
+        if (testX >= 128) {
+            overflow = true;
+
+            curLine++;
+            curX = 1;
+            curY = (1 + curLine * (defaultFont.baseSize + 1));
+        }
+
+        const int numBits = curWidth * defaultFont.baseSize;
         int numBytes = numBits / 8;
         if (numBits % 8) numBytes++;
 
-        uint8_t bytes[numBytes] = {};
+        uint8_t bytes[numBytes];
+        for (int bi = 0; bi < numBytes; bi++) bytes[bi] = 0;
 
-        for (int y = 0; y < cpDefaultFont.baseSize; y++) {
-            for (int x = 0; x < charsWidth[i]; x++) {
+        for (int y = 0; y < defaultFont.baseSize; y++) {
+            for (int x = 0; x < curWidth; x++) {
+                const int pixelIdx = (y * curWidth + x);
                 const int srcX = curX + x;
-                const int srcY = curY + x;
+                const int srcY = curY + y;
 
-                const uint32_t srcData = defaultFontData[(srcY * 128 + srcX) / 8];
-                const uint8_t srcBit = (srcData >> (31 - (srcX % 32))) & 1;
+                const uint32_t srcData = defaultFontData[(srcY * 128 + srcX) / 32];
+                const uint8_t srcBit = srcData >> (srcX % 32) & 1; // pixels are aligned with bytes, so no need for accuracy
 
-                bytes[x / 8] <<= 1;
-                bytes[x / 8] |= srcBit;
+                const int destIdx = pixelIdx / 8;
+                bytes[destIdx] |= srcBit << (pixelIdx % 8);
             }
         }
 
-        curX += charsWidth[i] + 1;
-        if (curX >= 128) {
-            curX = 0;
-            curY += cpDefaultFont.baseSize + 1;
+        if (overflow) {
+            curX += 1 + curWidth;
+            testX = curX;
+        } else {
+            curX = testX;
         }
 
         const cpFontGlyph glyph = {
-            .width = charsWidth[i],
-            .height = cpDefaultFont.baseSize,
+            .width = curWidth,
+            .height = defaultFont.baseSize,
             .data = malloc(sizeof(bytes))
         };
         memcpy(glyph.data, bytes, sizeof(bytes));
-
         glyphs[i] = glyph;
     }
 
-    memcpy(cpDefaultFont.glyphs, glyphs, sizeof(glyphs));
+    memcpy(defaultFont.glyphs, glyphs, sizeof(glyphs));
 }
 
-void cpDefaultFontUnload() {
-    for (int i = 0; i < cpDefaultFont.glyphCount; i++) {
-        free(cpDefaultFont.glyphs[i].data);
+void cpLoadDefaultFont() {
+    cpLoadFont(defaultFont);
+}
+
+void cpDefaultFontFree() {
+    for (int i = 0; i < defaultFont.glyphCount; i++) {
+        free(defaultFont.glyphs[i].data);
     }
 
-    free(cpDefaultFont.glyphs);
-    cpDefaultFont = (cpFont) {0};
+    free(defaultFont.glyphs);
+    defaultFont = (cpFont) {0};
 }
 
 void cpLoadFont(const cpFont font) {
     currentFont = font;
 }
 
-#include <stdio.h>
-
-void cpDrawText(const char* text, const int startX, const int startY, const cpColor tint) {
-    int curX = startX;
+void cpDrawText(const char* text, const int startX, const int startY, const int fontSize, const cpColor tint) {
+    int curX = 0;
     const int charCount = strlen(text);
     const int screenWidth = cpGetScreenWidth();
 
     for (int i = 0; i < charCount; i++) {
         // check if we can end early
-        if (curX >= screenWidth)
+        if (startX + curX*fontSize >= screenWidth)
             break;
 
         const char cur = text[i];
@@ -145,14 +174,23 @@ void cpDrawText(const char* text, const int startX, const int startY, const cpCo
 
         const cpFontGlyph glyph = currentFont.glyphs[glyphIdx];
 
+        // that's one nice block of code
         for (int y = 0; y < glyph.height; y++) {
             for (int x = 0; x < glyph.width; x++) {
-                const uint8_t byte = glyph.data[(y * glyph.height + x) / 8];
-                if ((byte >> (31 - x%8)))
-                    cpDrawPixel(curX + x, startY + y, tint);
+                const int pixelIdx = (y * glyph.width + x);
+                const uint8_t byte = glyph.data[pixelIdx / 8];
+                if (byte >> (pixelIdx % 8) & 1) {
+                    for (int dy = 0; dy < fontSize; dy++) {
+                        for (int dx = 0; dx < fontSize; dx++) {
+                            cpDrawPixel(startX + (curX + x)*fontSize + dx, startY + y*fontSize + dy, tint);
+                        }
+                    }
+                }
             }
         }
 
-        curX += glyph.width;
+        curX += glyph.width + currentFont.glyphSpacing;
     }
 }
+
+#endif

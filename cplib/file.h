@@ -1,6 +1,8 @@
 #ifndef CPLIB_FILE_H
 #define CPLIB_FILE_H
 
+#ifdef CPLIB_ENABLE_FILE
+
 #ifdef TARGET_PC
 
 #include <stdio.h>
@@ -36,7 +38,7 @@ typedef struct {
 } cpFile;
 
 typedef struct {
-    size_t count;
+    int count;
     char** names;
 } cpListDirResult;
 
@@ -58,18 +60,16 @@ int cpGetFilePosition(cpFile file);
 char* cpGetFileExtension(const char* path);
 char* cpGetFileName(const char* path);
 char* cpGetFileNameWithoutExt(const char* path);
-char* cpGetDirectoryName(const char* path);
+char* cpGetDirectoryPath(const char* path);
 
 char* cpCurrentDirectory();
 int cpMakeDirectory(const char* path);
 int cpChangeDirectory(const char* path);
 bool cpIsDirectory(const char* path);
+bool cpIsFile(const char* path);
 void cpListDirectory(const char* path, cpListDirResult* result);
 void cpFreeListDirResult(cpListDirResult* result);
 
-/*
- * Maybe:
- * - cpIsDirectory
- */
+#endif
 
 #endif

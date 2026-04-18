@@ -50,7 +50,8 @@ in your makefile.
 **CPLIB_ENABLE_VECTOR3I:** Enable cpVector3i struct and arithmetic functions.\
 **CPLIB_ENABLE_VECTOR4:** Enable cpVector4 struct and arithmetic functions.\
 **CPLIB_ENABLE_MATRIX4:** Enable cpMatrix4 struct and arithmetic functions.\
-**CPLIB_ENABLE_NOFRAMEBUF:** Write to VRAM instead of separate frame buffer. cpGetFramebuffer() will return the VRAM address. Might be a bit slower but will save a lot of RAM.
+**CPLIB_ENABLE_NOFRAMEBUF:** Write to VRAM instead of separate frame buffer. cpGetFramebuffer() will return the VRAM address. Might be a bit slower but will save a lot of RAM.\
+**CPLIB_ENABLE_FILE:** Enable file system access functions.
 
 You might need to define these before including cplib.h in order for your IDE to recognize it.
 

@@ -1,6 +1,6 @@
 # modified makefile originally from SnailMath's hollyhock-2 example makefile.
 
-APP_NAME:=cplib_test
+APP_NAME := cplib_test
 
 FIXPOINT_DEFS := -DFIXMATH_NO_CACHE -DFIXMATH_NO_CTYPE -DFIXMATH_NO_HARD_DIVISION -DFIXMATH_NO_64BIT # -DFIXMATH_FAST_SIN (excluded to not make 3d camera jitter)
 
@@ -8,7 +8,10 @@ C_VERSION := c23
 OPTIMIZATION_LEVEL := O3 # don't go lower than O1 (compilation errors!)
 
 # enable some features here (for example -DCPLIB_ENABLE_MATRIX4)
-CPLIB_FEATURES := -DCPLIB_ENABLE_3D
+CPLIB_FEATURES := -DCPLIB_ENABLE_3D -DCPLIB_ENABLE_FONT -DCPLIB_ENABLE_FILE
+
+# maximum number of threads
+# MAKEFLAGS := --jobs=$(shell nproc)
 
 C_PC := gcc
 C_PC_FLAGS := -W -Wall -DTARGET_PC -lraylib -std=$(C_VERSION) -$(OPTIMIZATION_LEVEL) $(FIXPOINT_DEFS) $(CPLIB_FEATURES)

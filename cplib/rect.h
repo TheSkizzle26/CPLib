@@ -9,5 +9,7 @@ typedef struct {
     int height;
 } cpRectangle;
 
+// TODO: add some functionality
+
 
 #endif

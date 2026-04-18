@@ -1,12 +1,17 @@
 #include "common.h"
 #include "file.h"
 
+#ifdef CPLIB_ENABLE_FILE
+
 #ifdef TARGET_PC
 
 #include <stdio.h>
 #include <sys/stat.h> // mkdir
+#include <sys/types.h>
 #include <stdlib.h>
 #include <string.h>
+#include <unistd.h>
+#include <dirent.h>
 
 #define BASE_PATH "./storage_emulated"
 #define OS_SEPARATOR '/'
@@ -423,7 +428,7 @@ char* cpGetFileNameWithoutExt(const char* path) {
     return nameNoExt;
 }
 
-char* cpGetDirectoryName(const char* path) {
+char* cpGetDirectoryPath(const char* path) {
     const int pathLength = strlen(path);
 
     int separatorIdx = 0;
@@ -548,13 +553,130 @@ int cpChangeDirectory(const char* path) {
 }
 
 bool cpIsDirectory(const char* path) {
+    char fullPath[BUF_SIZE];
+    buildPath(fullPath, BASE_PATH, currentDirectory, path);
 
+#ifdef TARGET_PC
+
+    struct stat info;
+    stat(fullPath, &info);
+    return !S_ISREG(info.st_mode);
+
+#else
+
+    calcFindInfo info;
+    int findHandle;
+
+    wchar_t pathWChar[strlen(fullPath)+1];
+    for (int i = 0; i < strlen(fullPath)+1; i++)
+        pathWChar[i] = (wchar_t)fullPath[i];
+
+    wchar_t name[BUF_SIZE]; // crashes without this?
+
+    if (CALC_FILE_findFirst(pathWChar, &findHandle, name, &info) < 0)
+        return false;
+    CALC_FILE_findClose(findHandle);
+
+    return info.calcEntryType == calcEntryTypeDirectory;
+
+#endif
 }
 
-void cpListDirectory(const char* path, cpListDirResult* result) {
+bool cpIsFile(const char* path) {
+    return !cpIsDirectory(path);
+}
 
+char* wchar_to_char(const wchar_t* buf) {
+    char* out = malloc(sizeof(char) * BUF_SIZE);
+
+    for (size_t i = 0; i < BUF_SIZE; i++) {
+        out[i] = (char)buf[i];
+        if (buf[i] == 0)
+            break;
+    }
+
+    return out;
+}
+
+// TODO: memory-optimized
+void cpListDirectory(const char* path, cpListDirResult* result) {
+    char fullPath[BUF_SIZE];
+    buildPath(fullPath, BASE_PATH, currentDirectory, path);
+
+#ifdef TARGET_PC
+
+    int nameCount = 0;
+    char names[128][BUF_SIZE];
+
+    DIR* d;
+    struct dirent* dir;
+    d = opendir(fullPath);
+    if (d) {
+        while ((dir = readdir(d)) != NULL) {
+            if (strcmp(dir->d_name, ".") == 0 || strcmp(dir->d_name, "..") == 0)
+                continue;
+            strcpy(names[nameCount++], dir->d_name);
+        }
+        closedir(d);
+    }
+
+    result->count = nameCount;
+    result->names = malloc(sizeof(char*) * nameCount);
+    for (int i = 0; i < nameCount; i++) {
+        result->names[i] = malloc(sizeof(char) * (strlen(names[i])+1));
+        strcpy(result->names[i], names[i]);
+    }
+
+#else
+
+    strcat(fullPath, "\\*");
+    wchar_t fullPathWChar[BUF_SIZE];
+    for (int i = 0; i < strlen(fullPath)+1; i++) {
+        fullPathWChar[i] = (wchar_t)fullPath[i];
+    }
+
+    char names[128][BUF_SIZE];
+
+    int handle = 0;
+    int nameCount = 0;
+    wchar_t name[BUF_SIZE];
+    calcFindInfo info;
+
+    if (CALC_FILE_findFirst(fullPathWChar, &handle, name, &info) < 0) {
+        *result = (cpListDirResult) {
+            0,
+            NULL
+        };
+        return;
+    }
+
+    do {
+        for (int i = 0; i < BUF_SIZE; i++) {
+            names[nameCount][i] = (char)name[i];
+            if (name[i] == (wchar_t)'\0')
+                break;
+        }
+        nameCount++;
+    } while (CALC_FILE_findNext(handle, name, &info) == 0);
+
+    CALC_FILE_findClose(handle);
+
+    result->count = nameCount;
+    result->names = malloc(sizeof(char*) * nameCount);
+    for (int i = 0; i < nameCount; i++) {
+        result->names[i] = malloc(sizeof(char) * (strlen(names[i])+1));
+        strcpy(result->names[i], names[i]);
+    }
+
+#endif
 }
 
 void cpFreeListDirResult(cpListDirResult* result) {
-
+    for (int i = 0; i < result->count; i++) {
+        free(result->names[i]);
+    }
+    result->count = 0;
+    free(result->names);
 }
+
+#endif

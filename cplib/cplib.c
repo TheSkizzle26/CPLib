@@ -189,7 +189,7 @@ void cpInit() {
 
     // load default font
     cpDefaultFontInit();
-    cpLoadFont(cpDefaultFont);
+    cpLoadDefaultFont();
 }
 
 void cpQuit() {

@@ -13,6 +13,8 @@
 // so my IDE doesn't hate me
 #ifndef CPLIB_ENABLE_3D
 #define CPLIB_ENABLE_3D
+#define CPLIB_ENABLE_FONT
+#define CPLIB_ENABLE_FILE
 #endif
 
 #include "cplib/cplib.h"
@@ -31,8 +33,10 @@ static int texX, texY;
 static int texVx, texVy;
 
 static cpMesh mesh;
-
 static cpCamera3d camera;
+
+char** dirNames;
+int dirCount;
 
 
 void init() {
@@ -99,6 +103,32 @@ void init() {
     camera = (cpCamera3d) {0};
     camera.position.y = fix16_from_int(2);
     camera.fovY = fix16_from_int(90);
+
+    // list directories
+    cpListDirResult result;
+    cpListDirectory("", &result);
+
+    // find number
+    int count = 0;
+    for (int i = 0; i < result.count; i++) {
+        const char* name = result.names[i];
+        if (cpIsDirectory(name))
+            count++;
+    }
+
+    dirNames = malloc(sizeof(char*) * count);
+    dirCount = count;
+    int idx = 0;
+    for (int i = 0; i < result.count; i++) {
+        const char* name = result.names[i];
+        if (cpIsDirectory(name)) {
+            dirNames[idx] = malloc(sizeof(char) * (strlen(name)+1));
+            strcpy(dirNames[idx], name);
+            idx++;
+        }
+    }
+
+    cpFreeListDirResult(&result);
 }
 
 void update() {
@@ -210,7 +240,13 @@ void render() {
         CP_RED
     );
 
-    cpDrawText("Hello, world!", 0, 0, CP_WHITE);
+    cpDrawText("Hello, world!", 20, 150, 2, CP_WHITE);
+
+    // show directories
+    for (int i = 0; i < dirCount; i++) {
+        const char* name = dirNames[i];
+        cpDrawText(name, 0, i*10, 1, CP_WHITE);
+    }
 
     cpEndDrawing();
 }
