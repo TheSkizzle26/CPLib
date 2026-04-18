@@ -58,5 +58,5 @@ You might need to define these before including cplib.h in order for your IDE to
 # TODOs:
 - add CALC_* prefix to cmt, power, etc.
 - Lower binary size.
-- Add file related functions.
-- Add text rendering.
+- Add touchscreen stuff
+- Add GUI functions
