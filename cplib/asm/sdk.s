@@ -76,4 +76,4 @@ CALC_GetKey_keyAddr:
 CALC_GetKey_and:
 	.long 0x0000FFFF
 
-
+DEFINE_OS_FUNC CALC_GetInput 0x8007CE2C

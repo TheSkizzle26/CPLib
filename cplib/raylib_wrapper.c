@@ -68,4 +68,17 @@ inline bool rlwIsKeyDown(uint32_t keycode) {
     return IsKeyDown(keycode);
 }
 
+inline int rlwGetMouseX() {
+    return GetMouseX();
+}
+
+inline int rlwGetMouseY() {
+    return GetMouseY();
+}
+
+inline bool rlwIsMouseButtonDown() {
+    return IsMouseButtonDown(MOUSE_BUTTON_LEFT);
+}
+
+
 #endif

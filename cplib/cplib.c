@@ -12,15 +12,18 @@
 #include "matrix.h"
 
 #ifdef TARGET_PC
+
 #include <stdlib.h>
 #include <string.h>
 #include "raylib_wrapper.h"
+
 #else
+
 #include "cpg.h"
 #include "cmt.h"
 #include "power.h"
-#endif
 
+#endif
 
 void CALC_LCD_ClearScreen();
 uint16_t CALC_LCD_GetPixel(int x, int y);
@@ -32,47 +35,46 @@ void CALC_LCD_SetPixelFromPalette(int x, int y, uint8_t index);
 void CALC_LCD_VRAMBackup();
 void CALC_LCD_VRAMRestore();
 
-
 // keys
 #define NUM_KEYS 34
 void CALC_getKey(uint32_t *key1, uint32_t *key2);
 
 #ifdef TARGET_PC
 static uint32_t keyCodes[NUM_KEYS] = {
-    RL_KEY_LEFT_SHIFT,
-    RL_KEY_DELETE,
-    RL_KEY_BACKSPACE,
-    RL_KEY_LEFT,
-    RL_KEY_RIGHT,
-    RL_KEY_Z,
-    RL_KEY_U,
-    RL_KEY_I,
-    RL_KEY_O,
-    RL_KEY_K,
-    RL_KEY_L,
-    RL_KEY_ENTER,
-    RL_KEY_RIGHT_SHIFT,
-    RL_KEY_THREE,
-    RL_KEY_SIX,
-    RL_KEY_NINE,
-    RL_KEY_INSERT,
-    RL_KEY_UP,
-    RL_KEY_DOWN,
-    RL_KEY_J,
-    RL_KEY_X,
-    RL_KEY_Y,
-    RL_KEY_Z,
-    RL_KEY_H,
-    RL_KEY_COMMA,
-    RL_KEY_MINUS,
-    RL_KEY_ZERO,
-    RL_KEY_PERIOD,
-    RL_KEY_ONE,
-    RL_KEY_TWO,
-    RL_KEY_FOUR,
-    RL_KEY_FIVE,
-    RL_KEY_SEVEN,
-    RL_KEY_EIGHT,
+    RLW_KEY_LEFT_SHIFT,
+    RLW_KEY_DELETE,
+    RLW_KEY_BACKSPACE,
+    RLW_KEY_LEFT,
+    RLW_KEY_RIGHT,
+    RLW_KEY_Z,
+    RLW_KEY_U,
+    RLW_KEY_I,
+    RLW_KEY_O,
+    RLW_KEY_K,
+    RLW_KEY_L,
+    RLW_KEY_ENTER,
+    RLW_KEY_RIGHT_SHIFT,
+    RLW_KEY_THREE,
+    RLW_KEY_SIX,
+    RLW_KEY_NINE,
+    RLW_KEY_INSERT,
+    RLW_KEY_UP,
+    RLW_KEY_DOWN,
+    RLW_KEY_J,
+    RLW_KEY_X,
+    RLW_KEY_Y,
+    RLW_KEY_Z,
+    RLW_KEY_H,
+    RLW_KEY_COMMA,
+    RLW_KEY_MINUS,
+    RLW_KEY_ZERO,
+    RLW_KEY_PERIOD,
+    RLW_KEY_ONE,
+    RLW_KEY_TWO,
+    RLW_KEY_FOUR,
+    RLW_KEY_FIVE,
+    RLW_KEY_SEVEN,
+    RLW_KEY_EIGHT,
 };
 #else
 static uint32_t keyCodes[NUM_KEYS] = {
@@ -113,18 +115,83 @@ static uint32_t keyCodes[NUM_KEYS] = {
 };
 #endif
 
+// touch
+typedef struct {
+    uint16_t type;
+    uint16_t zero;
+
+    union {
+        struct {
+            uint32_t direction;
+            uint16_t keyCode;
+        } key;
+
+        struct {
+            uint32_t direction;
+            int32_t p1_x;
+            int32_t p1_y;
+
+            uint16_t adc_x1;
+            uint16_t adc_y1;
+            uint16_t adc_z1;
+            uint16_t adc_z2;
+            uint16_t adc_x2;
+            uint16_t adc_y2;
+
+            uint16_t adc_gh;
+            uint16_t adc_dm;
+        } touch_single;
+
+        struct {
+            uint32_t direction;
+
+            int32_t p1_x;
+            int32_t p1_y;
+            int32_t p1_z;
+
+            int32_t p2_x;
+            int32_t p2_y;
+            int32_t p2_z;
+
+            uint32_t distance;
+
+            uint16_t adc_x1;
+            uint16_t adc_y1;
+            uint16_t adc_z1;
+            uint16_t adc_z2;
+            uint16_t adc_x2;
+            uint16_t adc_y2;
+
+            uint16_t adc_gh;
+            uint16_t adc_dm;
+        } touch_multi;
+    } data;
+} calcInputEvent;
+
+int CALC_GetInput(calcInputEvent* event, uint32_t unknown1, uint32_t unknown2);
+
+// some internal structs
 typedef struct {
     cpVector3 position; // use this instead of storing pos in viewMatrix, would require mat4x4
     cpMatrix3 rotationMatrix;
     fix16_t focalLength;
 } cpInternalCamera3d;
 
+typedef struct {
+    int posX;
+    int posY;
+    bool isTouchDown;
+} cpInternalTouchState;
+
+// internally used variables
 static int screenWidth, screenHeight;
 static int numPixels;
 static cpColor* pixelBuf __attribute__((aligned(32))); // faster memcpy
 
 static bool keyState[NUM_KEYS];
 static bool lastKeyState[NUM_KEYS];
+static cpInternalTouchState touchState;
+static cpInternalTouchState lastTouchState;
 
 static cpInternalCamera3d internalCamera3d;
 
@@ -145,6 +212,7 @@ static uint16_t* calcVRAM;
 
 void cpInit() {
 #ifdef TARGET_PC
+
     screenWidth = 320;
     screenHeight = 528;
     numPixels = screenWidth * screenHeight;
@@ -161,7 +229,9 @@ void cpInit() {
 #ifdef CPLIB_ENABLE_FILE
     cpMakeDirectory("");
 #endif
+
 #else
+
     // init lcd
     CALC_LCD_GetSize(&screenWidth, &screenHeight);
     numPixels = screenWidth * screenHeight;
@@ -181,6 +251,7 @@ void cpInit() {
 
     internalCamera3d = (cpInternalCamera3d) {0};
 
+    // some constants for rendering
     fixHalfScreenWidth = fix16_from_int(screenWidth / 2);
     fixHalfScreenHeight = fix16_from_int(screenHeight / 2);
     fixNegHalfScreenHeight = fix16_from_int(-screenHeight / 2);
@@ -188,6 +259,24 @@ void cpInit() {
         fix16_from_int(1),
         fix16_from_int(100)
     );
+
+    // init key state
+    for (int i = 0; i < NUM_KEYS; i++) {
+        keyState[i] = false;
+        lastKeyState[i] = false;
+    }
+
+    // init touch state
+    touchState = (cpInternalTouchState) {
+        0,
+        0,
+        false
+    };
+    lastTouchState = (cpInternalTouchState) {
+        0,
+        0,
+        false
+    };
 
     // load default font
 #ifdef CPLIB_ENABLE_FONT
@@ -198,9 +287,12 @@ void cpInit() {
 
 void cpQuit() {
 #ifdef TARGET_PC
+
     rlwCloseWindow();
     free(pixelBuf);
+
 #else
+
     // reset clock speed
     cpg_set_pll_mul(CP_OC_MUL_DEFAULT);
 
@@ -221,8 +313,11 @@ void cpQuit() {
 
 void cpSetTargetFPS(const int value) {
 #ifdef TARGET_PC
+
     rlwSetTargetFPS(value);
+
 #else
+
     if (value <= 0) {
         // fps unlocked
         POWER_MSTPCR0->CMT = 1; // disable timer
@@ -232,14 +327,19 @@ void cpSetTargetFPS(const int value) {
         cmt_set(CMT_TICKS_PER_SEC / value, CMT_MODE_ONE_SHOT, CMT_REQUEST_DISABLE);
         fpsUnlocked = false;
     }
+
 #endif
 }
 
 void cpSetOverclock(cpOverclockMultipliers mul) {
 #ifdef TARGET_PC
+
     mul *= 1; // don't throw unused warning
+
 #else
+
     cpg_set_pll_mul(mul);
+
 #endif
 }
 
@@ -276,18 +376,24 @@ inline uint16_t* cpGetFramebuffer() {
 
 inline void cpBeginDrawing() {
 #ifdef TARGET_PC
+
     rlwBeginDrawing();
+
 #else
+
     // start frame timer
     if (!fpsUnlocked)
         cmt_start();
+
 #endif
 }
 
 void cpEndDrawing() {
     memcpy(lastKeyState, keyState, sizeof(bool) * NUM_KEYS);
+    memcpy(&lastTouchState, &touchState, sizeof(cpInternalTouchState));
 
 #ifdef TARGET_PC
+
     // convert pixels
     for (int i = 0; i < numPixels; i++) {
         // https://stackoverflow.com/questions/2442576/how-does-one-convert-16-bit-rgb565-to-24-bit-rgb888
@@ -312,7 +418,16 @@ void cpEndDrawing() {
         keyState[i] = rlwIsKeyDown(keyCodes[i]);
     }
 
-    // set window title (no stdlib)
+    // fetch touch state
+    if ((touchState.isTouchDown = rlwIsMouseButtonDown())) {
+        touchState.posX = rlwGetMouseX();
+        touchState.posY = rlwGetMouseY();
+    } else {
+        touchState.posX = 0;
+        touchState.posY = 0;
+    }
+
+    // set window title (no stdlib, sadly)
     char title[32] = "CPLib emu | FPS: ";
 
     size_t numDigits = 0;
@@ -333,7 +448,9 @@ void cpEndDrawing() {
 
     title[endIdx] = 0;
     rlwSetWindowTitle(title);
+
 #else
+
     // draw pixel buffer
 #ifndef CPLIB_ENABLE_NOFRAMEBUF
     memcpy(calcVRAM, pixelBuf, (int)sizeof(uint16_t) * numPixels);
@@ -351,9 +468,27 @@ void cpEndDrawing() {
         keyState[i] = !!((i < 10 ? key1 : key2) & keycode);
     }
 
+    calcInputEvent inputEvent = {0};
+    CALC_GetInput(&inputEvent, 0xFFFFFFFF, 0x10);
+    touchState.isTouchDown = false;
+    if (inputEvent.type == 0x4000) {
+        if (inputEvent.data.touch_single.direction == 1 /* TOUCH_DOWN */ ||
+            inputEvent.data.touch_single.direction == 2 /* TOUCH_HOLD_DRAG */)
+            touchState.isTouchDown = true;
+    }
+
+    if (touchState.isTouchDown) {
+        touchState.posX = inputEvent.data.touch_single.p1_x;
+        touchState.posY = inputEvent.data.touch_single.p1_y;
+    } else {
+        touchState.posX = 0;
+        touchState.posY = 0;
+    }
+
     // wait till we reach our target fps
     if (!fpsUnlocked)
         cmt_wait();
+
 #endif
 }
 
@@ -821,4 +956,36 @@ inline bool cpIsKeyUp(const cpKeyIndices keyIdx) {
 
 inline bool cpIsKeyReleased(const cpKeyIndices keyIdx) {
     return !keyState[keyIdx] && lastKeyState[keyIdx];
+}
+
+inline bool cpIsTouchDown() {
+    return touchState.isTouchDown;
+}
+
+inline bool cpIsTouchPressed() {
+    return touchState.isTouchDown && !lastTouchState.isTouchDown;
+}
+
+inline bool cpIsTouchUp() {
+    return !touchState.isTouchDown;
+}
+
+inline bool cpIsTouchReleased() {
+    return !touchState.isTouchDown && lastTouchState.isTouchDown;
+}
+
+inline int cpGetTouchX() {
+    return touchState.posX;
+}
+
+inline int cpGetTouchY() {
+    return touchState.posY;
+}
+
+inline int cpGetTouchDeltaX() {
+    return touchState.posX - lastTouchState.posX;
+}
+
+inline int cpGetTouchDeltaY() {
+    return touchState.posY - lastTouchState.posY;
 }

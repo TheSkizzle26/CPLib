@@ -208,5 +208,14 @@ bool cpIsKeyPressed(cpKeyIndices keyIdx) [[unsequenced]]; // Has a key just been
 bool cpIsKeyUp(cpKeyIndices keyIdx) [[unsequenced]]; // Is a key up?
 bool cpIsKeyReleased(cpKeyIndices keyIdx) [[unsequenced]]; // Has a key just been released?
 
+bool cpIsTouchDown() [[unsequenced]]; // Is the screen touched?
+bool cpIsTouchPressed() [[unsequenced]]; // Has the screen just been touched?
+bool cpIsTouchUp() [[unsequenced]]; // Is the screen not touched?
+bool cpIsTouchReleased() [[unsequenced]]; // Has the screen just been untouched?
+int cpGetTouchX() [[unsequenced]]; // Get the touch x position, 0 if not touched.
+int cpGetTouchY() [[unsequenced]]; // Get the touch y position, 0 if not touched.
+int cpGetTouchDeltaX() [[unsequenced]]; // Get the difference between the current and last touch x.
+int cpGetTouchDeltaY() [[unsequenced]]; // Get the difference between the current and last touch y.
+
 
 #endif //CPLIB_CPLIB_H

@@ -105,7 +105,7 @@ void cpDefaultFontInit() {
         if (numBits % 8) numBytes++;
 
         uint8_t bytes[numBytes];
-        for (int bi = 0; bi < numBytes; bi++) bytes[bi] = 0;
+        memset(bytes, 0, sizeof(bytes));
 
         for (int y = 0; y < defaultFont.baseSize; y++) {
             for (int x = 0; x < curWidth; x++) {

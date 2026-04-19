@@ -2,7 +2,7 @@
 A library for drawing, input, etc. for the ClassPad II calculator.\
 Runs on both the calculator and your PC!
 
-# Use
+# How to use
 Just copy the "cplib" folder into your project.\
 Also take a look at linker.ld, Makefile and of course example.c.\
 The 3D rendering works a bit differently than raylib's. Just take a look at the 3d part in cplib/cplib.h. \
@@ -16,6 +16,8 @@ If you want to run this on your PC, you will need to have raylib installed.
 - shape drawing
 - vectors
 - matrices
+- full file system access (uses and emulated folder on the PC)
+- simple font rendering
 - also includes libfixmath for float vectors
 - lots of features are toggleable for smaller binaries
 
@@ -60,3 +62,4 @@ You might need to define these before including cplib.h in order for your IDE to
 - Lower binary size.
 - Add touchscreen stuff
 - Add GUI functions
+- implement sprintf since we don't have stdlib
