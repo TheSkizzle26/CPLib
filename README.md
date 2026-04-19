@@ -40,7 +40,7 @@ int main() {
     }
 
     cpQuit();
-    return true;
+    return 0;
 }
 ```
 
