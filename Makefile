@@ -11,7 +11,7 @@ OPTIMIZATION_LEVEL := O3 # don't go lower than O1 (compilation errors!)
 CPLIB_FEATURES := -DCPLIB_ENABLE_3D -DCPLIB_ENABLE_FONT -DCPLIB_ENABLE_FILE
 
 # maximum number of threads
-# MAKEFLAGS := --jobs=$(shell nproc)
+MAKEFLAGS := --jobs=$(shell nproc)
 
 C_PC := gcc
 C_PC_FLAGS := -W -Wall -DTARGET_PC -lraylib -std=$(C_VERSION) -$(OPTIMIZATION_LEVEL) $(FIXPOINT_DEFS) $(CPLIB_FEATURES)
