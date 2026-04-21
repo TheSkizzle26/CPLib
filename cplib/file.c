@@ -141,11 +141,14 @@ cpFile cpFileOpen(const char* path, const cpFileModes mode) {
 
 #endif
 
-    return (cpFile) {
+    const cpFile ret = {
         internalFile,
         mode,
         isInvalid
     };
+
+    cpFileSeek(ret, 0, CP_SEEK_START);
+    return ret;
 }
 
 int cpFileClose(const cpFile file) {
