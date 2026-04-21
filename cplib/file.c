@@ -147,7 +147,9 @@ cpFile cpFileOpen(const char* path, const cpFileModes mode) {
         isInvalid
     };
 
-    cpFileSeek(ret, 0, CP_SEEK_START);
+    if (!isInvalid)
+        cpFileSeek(ret, 0, CP_SEEK_START);
+
     return ret;
 }
 
