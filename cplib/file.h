@@ -34,6 +34,7 @@ typedef struct {
 #endif
 
     cpFileModes mode;
+    int position; // only used on calc
     bool isInvalid; // can be used to check if the file's opened correctly
 } cpFile;
 

@@ -144,6 +144,7 @@ cpFile cpFileOpen(const char* path, const cpFileModes mode) {
     const cpFile ret = {
         internalFile,
         mode,
+        0
         isInvalid
     };
 
@@ -191,7 +192,11 @@ int cpFileRead(const cpFile file, const int byteCount, char* buf) {
 
 #else
 
-    return CALC_FILE_read(file.internalFile, buf, byteCount) < 0;
+    int ret = CALC_FILE_read(file.internalFile, buf, byteCount);
+    if (ret < 0)
+        return 1; // error
+
+    file.position += ret;
 
 #endif
 }
@@ -207,7 +212,11 @@ int cpFileWrite(const cpFile file, const int byteCount, const char* buf) {
 
 #else
 
-    return CALC_FILE_write(file.internalFile, buf, byteCount) < 0;
+    int ret = CALC_FILE_write(file.internalFile, buf, byteCount);
+    if (ret < 0)
+        return 1; // error
+
+    file.position += ret; // number of bytes written
 
 #endif
 }
@@ -325,9 +334,7 @@ int cpGetFilePosition(const cpFile file) {
 
 #else
 
-    calcStat stat;
-    CALC_FILE_fstat(file.internalFile, &stat);
-    return (int)stat.fileSize;
+    return file.position;
 
 #endif
 }
