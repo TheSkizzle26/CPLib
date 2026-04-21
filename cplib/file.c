@@ -197,6 +197,7 @@ int cpFileRead(cpFile file, const int byteCount, char* buf) {
         return 1; // error
 
     file.position += ret;
+    return 0;
 
 #endif
 }
@@ -217,6 +218,7 @@ int cpFileWrite(cpFile file, const int byteCount, const char* buf) {
         return 1; // error
 
     file.position += ret; // number of bytes written
+    return 0;
 
 #endif
 }
