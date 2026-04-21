@@ -144,7 +144,7 @@ cpFile cpFileOpen(const char* path, const cpFileModes mode) {
     const cpFile ret = {
         internalFile,
         mode,
-        0
+        0,
         isInvalid
     };
 
