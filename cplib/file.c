@@ -181,7 +181,7 @@ cpFile cpFileSeek(const cpFile file, const int position, const int origin) {
     return file;
 }
 
-int cpFileRead(const cpFile file, const int byteCount, char* buf) {
+int cpFileRead(cpFile file, const int byteCount, char* buf) {
     if (file.mode != CP_FILE_MODE_READ)
         return 1;
 
@@ -201,7 +201,7 @@ int cpFileRead(const cpFile file, const int byteCount, char* buf) {
 #endif
 }
 
-int cpFileWrite(const cpFile file, const int byteCount, const char* buf) {
+int cpFileWrite(cpFile file, const int byteCount, const char* buf) {
     if (file.mode != CP_FILE_MODE_WRITE)
         return 1;
 
