@@ -34,7 +34,6 @@ typedef struct {
 #endif
 
     cpFileModes mode;
-    int position; // only used on calc
     bool isInvalid; // can be used to check if the file's opened correctly
 } cpFile;
 
@@ -57,7 +56,6 @@ int cpFileCopy(const char* srcPath, const char* destPath); // Copy a file to a n
 int cpFileMove(const char* srcPath, const char* destPath); // Move a file to a new path.
 
 int cpGetFileLength(cpFile file); // Get a file's length in bytes.
-int cpGetFilePosition(cpFile file); // Get the current position inside a file.
 char* cpGetFileExtension(const char* path); // Get a file's extension, for example ".txt".
 char* cpGetFileName(const char* path); // Get a file's name, for example "file.txt".
 char* cpGetFileNameWithoutExt(const char* path); // Get a file's name without the extension, for example "file".

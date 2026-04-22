@@ -1,6 +1,8 @@
 #include "common.h"
 #include "file.h"
 
+#include "../emu/common.h"
+
 #ifdef CPLIB_ENABLE_FILE
 
 #ifdef TARGET_PC
@@ -144,12 +146,8 @@ cpFile cpFileOpen(const char* path, const cpFileModes mode) {
     const cpFile ret = {
         internalFile,
         mode,
-        0,
         isInvalid
     };
-
-    if (!isInvalid)
-        cpFileSeek(ret, 0, CP_SEEK_START);
 
     return ret;
 }
@@ -181,44 +179,32 @@ cpFile cpFileSeek(const cpFile file, const int position, const int origin) {
     return file;
 }
 
-int cpFileRead(cpFile file, const int byteCount, char* buf) {
+int cpFileRead(const cpFile file, const int byteCount, char* buf) {
     if (file.mode != CP_FILE_MODE_READ)
         return 1;
 
 #ifdef TARGET_PC
 
-    const int bytesRead = fread(buf, sizeof(char), byteCount, file.internalFile);
-    return bytesRead < byteCount;
+    return (int)fread(buf, sizeof(char), byteCount, file.internalFile) < byteCount;
 
 #else
 
-    int ret = CALC_FILE_read(file.internalFile, buf, byteCount);
-    if (ret < 0)
-        return 1; // error
-
-    file.position += ret;
-    return 0;
+    return CALC_FILE_read(file.internalFile, buf, byteCount) < 0;
 
 #endif
 }
 
-int cpFileWrite(cpFile file, const int byteCount, const char* buf) {
+int cpFileWrite(const cpFile file, const int byteCount, const char* buf) {
     if (file.mode != CP_FILE_MODE_WRITE)
         return 1;
 
 #ifdef TARGET_PC
 
-    const int writtenBytes = fwrite(buf, sizeof(char), byteCount, file.internalFile);
-    return writtenBytes < byteCount;
+    return (int)fwrite(buf, sizeof(char), byteCount, file.internalFile) < byteCount;
 
 #else
 
-    int ret = CALC_FILE_write(file.internalFile, buf, byteCount);
-    if (ret < 0)
-        return 1; // error
-
-    file.position += ret; // number of bytes written
-    return 0;
+    return CALC_FILE_write(file.internalFile, buf, byteCount) < 0;
 
 #endif
 }
@@ -319,24 +305,21 @@ int cpFileMove(const char* srcPath, const char* destPath) {
     return cpFileRemove(srcPath);
 }
 
-
 int cpGetFileLength(const cpFile file) {
-    const int before = cpGetFilePosition(file);
+#ifdef TARGET_PC
+
+    const int before = (int)ftell(file.internalFile);
     cpFileSeek(file, 0, CP_SEEK_END);
-    const int length = cpGetFilePosition(file);
+    const int length = (int)ftell(file.internalFile);
     cpFileSeek(file, before, CP_SEEK_START);
 
     return length;
-}
-
-int cpGetFilePosition(const cpFile file) {
-#ifdef TARGET_PC
-
-    return ftell(file.internalFile);
 
 #else
 
-    return file.position;
+    calcStat stat;
+    CALC_FILE_fstat(file.internalFile, &stat);
+    return (int)stat.fileSize;
 
 #endif
 }
