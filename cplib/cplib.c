@@ -343,10 +343,7 @@ void cpSetOverclock(cpOverclockMultipliers mul) {
 #endif
 }
 
-inline cpColor cpRGBToColor(const uint8_t r, const uint8_t g, const uint8_t b) {
-    // https://stackoverflow.com/a/11471397
-    return ((r & 0b11111000) << 8) | ((g & 0b11111100) << 3) | (b >> 3);
-}
+cpColor cpRGBToColor(uint8_t r, uint8_t g, uint8_t b);
 
 // expects normalized vector
 inline void cpVector3ToAngles(const cpVector3 v, fix16_t* yaw, fix16_t* pitch) {

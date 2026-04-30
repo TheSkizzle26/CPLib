@@ -159,7 +159,12 @@ void cpSetOverclock(cpOverclockMultipliers mul); // Set the overclock multiplier
 
 // utilities
 
-cpColor cpRGBToColor(uint8_t r, uint8_t g, uint8_t b) [[unsequenced]]; // Convert RGB values to a color.
+// Convert RGB values to a color.
+inline cpColor cpRGBToColor(const uint8_t r, const uint8_t g, const uint8_t b) {
+    // https://stackoverflow.com/a/11471397
+    return ((r & 0b11111000) << 8) | ((g & 0b11111100) << 3) | (b >> 3);
+}
+
 void cpVector3ToAngles(cpVector3 v, fix16_t* yaw, fix16_t* pitch) [[unsequenced]]; // Convert a cpVector3 to individual angles.
 cpVector3 cpAnglesToVector3(fix16_t yaw, fix16_t pitch) [[unsequenced]];// Convert individual angles to a cpVector3.
 
