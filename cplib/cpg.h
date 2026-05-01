@@ -109,7 +109,7 @@ inline void cpg_frqf_wait()
 }
 
 // changed the type so my ide's not mad at me
-inline void cpg_set_pll_mul(uint32_t multiplier)
+inline void cpg_set_pll_mul(const uint32_t multiplier)
 {
   // Set new PLL multiplier and activate it
   CPG_FRQCRA->STC = multiplier;

@@ -66,59 +66,59 @@ HOLLYHOCK_SECTION_STRING(version, app_version)
 #define CP_RAYWHITE 63422
 
 typedef enum {
-    CP_OC_MUL_12 = 0x05,
-    CP_OC_MUL_16 = 0x07,
-    CP_OC_MUL_24 = 0x0B,
-    CP_OC_MUL_30 = 0x0E,
-    CP_OC_MUL_32 = 0x0F,
-    CP_OC_MUL_36 = 0x11,
-    CP_OC_MUL_48 = 0x17,
+    CP_OC_MUL_12        = 0x05,
+    CP_OC_MUL_16        = 0x07,
+    CP_OC_MUL_24        = 0x0B,
+    CP_OC_MUL_30        = 0x0E,
+    CP_OC_MUL_32        = 0x0F,
+    CP_OC_MUL_36        = 0x11,
+    CP_OC_MUL_48        = 0x17,
 
-    CP_OC_MUL_DEFAULT = 0x0F, // same as OC_MUL_32
+    CP_OC_MUL_DEFAULT   = 0x0F, // same as OC_MUL_32
 } cpOverclockMultipliers;
 
 typedef enum {
-    CP_KEY_SHIFT		= 0,
-    CP_KEY_CLEAR		= 1, //The Power key
-    CP_KEY_BACKSPACE	= 2,
-    CP_KEY_LEFT		= 3,
-    CP_KEY_RIGHT		= 4,
-    CP_KEY_Z			= 5,
-    CP_KEY_POWER		= 6, //The exponent key
-    CP_KEY_DIVIDE		= 7,
-    CP_KEY_MULTIPLY	= 8,
-    CP_KEY_SUBTRACT	= 9,
-    CP_KEY_ADD			= 10,
-    CP_KEY_EXE			= 11,
-    CP_KEY_EXP			= 12,
-    CP_KEY_3			= 13,
-    CP_KEY_6			= 14,
-    CP_KEY_9			= 15,
+    CP_KEY_SHIFT		    = 0,
+    CP_KEY_CLEAR		    = 1, //The Power key
+    CP_KEY_BACKSPACE	    = 2,
+    CP_KEY_LEFT		        = 3,
+    CP_KEY_RIGHT		    = 4,
+    CP_KEY_Z			    = 5,
+    CP_KEY_POWER		    = 6, //The exponent key
+    CP_KEY_DIVIDE		    = 7,
+    CP_KEY_MULTIPLY	        = 8,
+    CP_KEY_SUBTRACT	        = 9,
+    CP_KEY_ADD			    = 10,
+    CP_KEY_EXE			    = 11,
+    CP_KEY_EXP			    = 12,
+    CP_KEY_3			    = 13,
+    CP_KEY_6			    = 14,
+    CP_KEY_9			    = 15,
 
-    CP_KEY_KEYBOARD	= 16,
-    CP_KEY_UP			= 17,
-    CP_KEY_DOWN		= 18,
-    CP_KEY_EQUALS		= 19,
-    CP_KEY_X			= 20,
-    CP_KEY_Y			= 21,
-    CP_KEY_LEFT_BRACKET= 22,
-    CP_KEY_RIGHT_BRACKET= 23,
-    CP_KEY_COMMA		= 24,
-    CP_KEY_NEGATIVE	= 25,
-    CP_KEY_0			= 26,
-    CP_KEY_DOT			= 27,
-    CP_KEY_1			= 28,
-    CP_KEY_2			= 29,
-    CP_KEY_4			= 30,
-    CP_KEY_5			= 31,
-    CP_KEY_7			= 32,
-    CP_KEY_8			= 33,
+    CP_KEY_KEYBOARD	        = 16,
+    CP_KEY_UP			    = 17,
+    CP_KEY_DOWN		        = 18,
+    CP_KEY_EQUALS		    = 19,
+    CP_KEY_X			    = 20,
+    CP_KEY_Y			    = 21,
+    CP_KEY_LEFT_BRACKET     = 22,
+    CP_KEY_RIGHT_BRACKET    = 23,
+    CP_KEY_COMMA		    = 24,
+    CP_KEY_NEGATIVE	        = 25,
+    CP_KEY_0			    = 26,
+    CP_KEY_DOT			    = 27,
+    CP_KEY_1			    = 28,
+    CP_KEY_2			    = 29,
+    CP_KEY_4			    = 30,
+    CP_KEY_5			    = 31,
+    CP_KEY_7			    = 32,
+    CP_KEY_8			    = 33,
 } cpKeyIndices;
 
 
 typedef enum {
-    CP_PIXEL_FORMAT_RGB565 = 0, // RGB565 -> 2 bytes
-    CP_PIXEL_FORMAT_RGB565_A8 = 1 // RGB565 + 1 byte alpha (bool) -> 3 bytes
+    CP_PIXEL_FORMAT_RGB565      = 0, // RGB565 -> 2 bytes
+    CP_PIXEL_FORMAT_RGB565_A8   = 1 // RGB565 + 1 byte alpha (bool) -> 3 bytes
 } cpPixelFormat;
 
 typedef struct {
@@ -166,7 +166,9 @@ void cpSetOverclock(cpOverclockMultipliers mul); // Set the overclock multiplier
 // utilities
 
 // Convert RGB values to a color.
-inline cpColor cpRGBToColor(const uint8_t r, const uint8_t g, const uint8_t b) {
+// For inputs known at compile-time,
+// your compiler might just replace this with the result.
+inline cpColor cpRGBToColor(const uint8_t r, const uint8_t g, const uint8_t b) [[unsequenced]] {
     // https://stackoverflow.com/a/11471397
     return ((r & 0b11111000) << 8) | ((g & 0b11111100) << 3) | (b >> 3);
 }
@@ -174,9 +176,9 @@ inline cpColor cpRGBToColor(const uint8_t r, const uint8_t g, const uint8_t b) {
 void cpVector3ToAngles(cpVector3 v, fix16_t* yaw, fix16_t* pitch) [[unsequenced]]; // Convert a cpVector3 to individual angles.
 cpVector3 cpAnglesToVector3(fix16_t yaw, fix16_t pitch) [[unsequenced]];// Convert individual angles to a cpVector3.
 
-int cpGetScreenWidth() [[unsequenced]]; // Get the screen's width.
-int cpGetScreenHeight() [[unsequenced]]; // Get the screen's height.
-uint16_t* cpGetFramebuffer() [[unsequenced]]; // Get a pointer to the framebuffer.
+int cpGetScreenWidth(); // Get the screen's width.
+int cpGetScreenHeight(); // Get the screen's height.
+uint16_t* cpGetFramebuffer(); // Get a pointer to the framebuffer.
 
 // 2d drawing functions
 
@@ -225,19 +227,19 @@ bool cpCheckCollisionLines(cpVector2i start1, cpVector2i end1, cpVector2i start2
 
 // input functions
 
-bool cpIsKeyDown(cpKeyIndices keyIdx) [[unsequenced]]; // Is a key down?
-bool cpIsKeyPressed(cpKeyIndices keyIdx) [[unsequenced]]; // Has a key just been pressed?
-bool cpIsKeyUp(cpKeyIndices keyIdx) [[unsequenced]]; // Is a key up?
-bool cpIsKeyReleased(cpKeyIndices keyIdx) [[unsequenced]]; // Has a key just been released?
+bool cpIsKeyDown(cpKeyIndices keyIdx); // Is a key down?
+bool cpIsKeyPressed(cpKeyIndices keyIdx); // Has a key just been pressed?
+bool cpIsKeyUp(cpKeyIndices keyIdx); // Is a key up?
+bool cpIsKeyReleased(cpKeyIndices keyIdx); // Has a key just been released?
 
-bool cpIsTouchDown() [[unsequenced]]; // Is the screen touched?
-bool cpIsTouchPressed() [[unsequenced]]; // Has the screen just been touched?
-bool cpIsTouchUp() [[unsequenced]]; // Is the screen not touched?
-bool cpIsTouchReleased() [[unsequenced]]; // Has the screen just been untouched?
-int cpGetTouchX() [[unsequenced]]; // Get the touch x position, 0 if not touched.
-int cpGetTouchY() [[unsequenced]]; // Get the touch y position, 0 if not touched.
-int cpGetTouchDeltaX() [[unsequenced]]; // Get the difference between the current and last touch x.
-int cpGetTouchDeltaY() [[unsequenced]]; // Get the difference between the current and last touch y.
+bool cpIsTouchDown(); // Is the screen touched?
+bool cpIsTouchPressed(); // Has the screen just been touched?
+bool cpIsTouchUp(); // Is the screen not touched?
+bool cpIsTouchReleased(); // Has the screen just been untouched?
+int cpGetTouchX(); // Get the touch x position, 0 if not touched.
+int cpGetTouchY(); // Get the touch y position, 0 if not touched.
+int cpGetTouchDeltaX(); // Get the difference between the current and last touch x.
+int cpGetTouchDeltaY(); // Get the difference between the current and last touch y.
 
 
 #endif //CPLIB_CPLIB_H

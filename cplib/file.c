@@ -26,37 +26,24 @@
 
 
 typedef struct {
-    // ReSharper disable once CppDeclaratorNeverUsed
     uint32_t unknown1;
-    // ReSharper disable once CppDeclaratorNeverUsed
     uint32_t fileSize;
-    // ReSharper disable once CppDeclaratorNeverUsed
     uint16_t creationDate;
-    // ReSharper disable once CppDeclaratorNeverUsed
     uint16_t creationTime;
-    // ReSharper disable once CppDeclaratorNeverUsed
     uint16_t lastModifiedDate;
-    // ReSharper disable once CppDeclaratorNeverUsed
     uint16_t lastModifiedTime;
-    // ReSharper disable once CppDeclaratorNeverUsed
     uint16_t unknown2;
-    // ReSharper disable once CppDeclaratorNeverUsed
     uint16_t lastAccessedDate;
 } calcStat;
 
 typedef struct {
-    // ReSharper disable once CppDeclaratorNeverUsed
     uint8_t unknown0[4];
-    // ReSharper disable once CppDeclaratorNeverUsed
     enum : uint16_t {
         calcEntryTypeFile = 0x1,
         calcEntryTypeDirectory = 0x5
     } calcEntryType;
-    // ReSharper disable once CppDeclaratorNeverUsed
     uint8_t unknown1[2];
-    // ReSharper disable once CppDeclaratorNeverUsed
     uint32_t size;
-    // ReSharper disable once CppDeclaratorNeverUsed
     uint8_t unknown2[8];
 } calcFindInfo;
 

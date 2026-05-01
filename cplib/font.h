@@ -25,7 +25,7 @@ typedef struct {
 
 void cpDefaultFontInit(); // Called inside cpInit().
 void cpLoadDefaultFont(); // Load the CPLib's default font.
-void cpDefaultFontFree(); // Free the default font clearing up a bit of RAM.
+void cpDefaultFontFree(); // Free the default font, clearing up a bit of RAM.
 void cpLoadFont(cpFont font); // Load a specific font.
 void cpDrawText(const char* text, int startX, int startY, int fontSize, cpColor tint); // Draw some text.
 

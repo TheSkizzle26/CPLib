@@ -494,8 +494,8 @@ void cpClearBackground(const cpColor tint) {
         cpInternalPixelBuf[i] = tint;
 }
 
-void cpDrawPixelUnsafe(int x, int y, cpColor tint); // Draw a pixel, no clipping.
-void cpDrawPixel(int x, int y, cpColor tint); // Draw a pixel.
+void cpDrawPixelUnsafe(int x, int y, cpColor tint);
+void cpDrawPixel(int x, int y, cpColor tint);
 
 static void cpDrawLineClippedSub(int x1, int y1, int x2, int y2, const cpColor tint) {
     // just a copy of the function below but with clipping

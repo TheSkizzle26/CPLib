@@ -16,7 +16,7 @@ If you want to run this on your PC, you will need to have raylib installed.
 - shape drawing
 - vectors
 - matrices
-- full file system access (uses and emulated folder on the PC)
+- full file system access (uses an emulated folder on the PC)
 - simple font rendering
 - also includes libfixmath for float vectors
 - lots of features are toggleable for smaller binaries
@@ -53,7 +53,7 @@ in your makefile.
 **CPLIB_ENABLE_VECTOR4:** Enable cpVector4 struct and arithmetic functions.\
 **CPLIB_ENABLE_MATRIX4:** Enable cpMatrix4 struct and arithmetic functions.\
 **CPLIB_ENABLE_NOFRAMEBUF:** Write to VRAM instead of separate frame buffer. cpGetFramebuffer() will return the VRAM address. Might be a bit slower but will save a lot of RAM.\
-**CPLIB_ENABLE_FILE:** Enable file system access functions.
+**CPLIB_ENABLE_FILE:** Enable file system access functions.\
 **CPLIB_ENABLE_FONT:** Enable font drawing functions.
 
 You might need to define these before including cplib.h in order for your IDE to recognize it.
@@ -64,3 +64,4 @@ You might need to define these before including cplib.h in order for your IDE to
 - Add touchscreen stuff
 - Add GUI functions
 - implement sprintf since we don't have stdlib
+- clean up some of the code, put all declarations in one header

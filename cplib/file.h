@@ -22,8 +22,8 @@
 
 
 typedef enum {
-    CP_FILE_MODE_READ = 0,
-    CP_FILE_MODE_WRITE = 1,
+    CP_FILE_MODE_READ       = 0,
+    CP_FILE_MODE_WRITE      = 1,
 } cpFileModes;
 
 typedef struct {
@@ -56,10 +56,10 @@ int cpFileCopy(const char* srcPath, const char* destPath); // Copy a file to a n
 int cpFileMove(const char* srcPath, const char* destPath); // Move a file to a new path.
 
 int cpGetFileLength(cpFile file); // Get a file's length in bytes.
-char* cpGetFileExtension(const char* path); // Get a file's extension, for example ".txt".
-char* cpGetFileName(const char* path); // Get a file's name, for example "file.txt".
-char* cpGetFileNameWithoutExt(const char* path); // Get a file's name without the extension, for example "file".
-char* cpGetDirectoryPath(const char* path); // Get the specified path without the file name.
+char* cpGetFileExtension(const char* path) [[unsequenced]]; // Get a file's extension, for example ".txt".
+char* cpGetFileName(const char* path) [[unsequenced]]; // Get a file's name, for example "file.txt".
+char* cpGetFileNameWithoutExt(const char* path) [[unsequenced]]; // Get a file's name without the extension, for example "file".
+char* cpGetDirectoryPath(const char* path) [[unsequenced]]; // Get the specified path without the file name.
 
 char* cpCurrentDirectory(); // Get the current working directory.
 int cpMakeDirectory(const char* path); // Create a directory.
@@ -67,7 +67,7 @@ int cpChangeDirectory(const char* path); // Change the current working directory
 bool cpIsDirectory(const char* path); // Check if a path is a directory;
 bool cpIsFile(const char* path); // Check if a path is a file.
 void cpListDirectory(const char* path, cpListDirResult* result); // List the contents of a directory. Call cpFreeListDirResults() once done with the results.
-void cpFreeListDirResult(cpListDirResult* result); // Free the results of cpListDirectory().
+void cpFreeListDirResult(cpListDirResult* result) [[unsequenced]]; // Free the results of cpListDirectory().
 
 #endif
 

@@ -1,6 +1,8 @@
 /*
  * This example file showcases basically
- * all the functionality in this library.
+ * all the functionality in this library,
+ * except for file access and some other
+ * smaller things.
  */
 
 // so my IDE doesn't hate me
