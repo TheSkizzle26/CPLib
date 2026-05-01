@@ -184,9 +184,9 @@ typedef struct {
 } cpInternalTouchState;
 
 // internally used variables
-static int screenWidth, screenHeight;
 static int numPixels;
-static cpColor* pixelBuf __attribute__((aligned(32))); // faster memcpy
+int cpInternalScreenWidth, cpInternalScreenHeight;
+cpColor* cpInternalPixelBuf __attribute__((aligned(32))); // alignment for faster memcpy
 
 static bool keyState[NUM_KEYS];
 static bool lastKeyState[NUM_KEYS];
@@ -213,17 +213,17 @@ static uint16_t* calcVRAM;
 void cpInit() {
 #ifdef TARGET_PC
 
-    screenWidth = 320;
-    screenHeight = 528;
-    numPixels = screenWidth * screenHeight;
-    rlwInitWindow(screenWidth, screenHeight, "CPLib emu");
+    cpInternalScreenWidth = 320;
+    cpInternalScreenHeight = 528;
+    numPixels = cpInternalScreenWidth * cpInternalScreenHeight;
+    rlwInitWindow(cpInternalScreenWidth, cpInternalScreenHeight, "CPLib emu");
 
     // create raylib stuff
-    rlTexture = rlwCreateTexture(screenWidth, screenHeight);
+    rlTexture = rlwCreateTexture(cpInternalScreenWidth, cpInternalScreenHeight);
     rlPixelBuf = (uint8_t*)malloc(sizeof(uint8_t) * 4*numPixels);
     memset(rlPixelBuf, 0, (int)sizeof(uint8_t) * 4*numPixels);
 
-    pixelBuf = (cpColor*)malloc(sizeof(cpColor) * numPixels);
+    cpInternalPixelBuf = (cpColor*)malloc(sizeof(cpColor) * numPixels);
 
     // create emulated storage folder
 #ifdef CPLIB_ENABLE_FILE
@@ -233,28 +233,28 @@ void cpInit() {
 #else
 
     // init lcd
-    CALC_LCD_GetSize(&screenWidth, &screenHeight);
-    numPixels = screenWidth * screenHeight;
+    CALC_LCD_GetSize(&cpInternalScreenWidth, &cpInternalScreenHeight);
+    numPixels = cpInternalScreenWidth * cpInternalScreenHeight;
     calcVRAM = CALC_LCD_GetVRAMAddress();
     CALC_LCD_VRAMBackup();
 
 #ifdef CPLIB_ENABLE_NOFRAMEBUF
-    pixelBuf = calcVRAM;
+    cpInternalPixelBuf = calcVRAM;
 #else
-    pixelBuf = (cpColor*)malloc(sizeof(cpColor) * numPixels);
+    cpInternalPixelBuf = (cpColor*)malloc(sizeof(cpColor) * numPixels);
 #endif
 
 #endif
 
-    memset(pixelBuf, 0, (int)sizeof(cpColor) * numPixels);
+    memset(cpInternalPixelBuf, 0, (int)sizeof(cpColor) * numPixels);
     cpSetTargetFPS(0);
 
     internalCamera3d = (cpInternalCamera3d) {0};
 
     // some constants for rendering
-    fixHalfScreenWidth = fix16_from_int(screenWidth / 2);
-    fixHalfScreenHeight = fix16_from_int(screenHeight / 2);
-    fixNegHalfScreenHeight = fix16_from_int(-screenHeight / 2);
+    fixHalfScreenWidth = fix16_from_int(cpInternalScreenWidth / 2);
+    fixHalfScreenHeight = fix16_from_int(cpInternalScreenHeight / 2);
+    fixNegHalfScreenHeight = fix16_from_int(-cpInternalScreenHeight / 2);
     fixEps = fix16_div(
         fix16_from_int(1),
         fix16_from_int(100)
@@ -289,7 +289,7 @@ void cpQuit() {
 #ifdef TARGET_PC
 
     rlwCloseWindow();
-    free(pixelBuf);
+    free(cpInternalPixelBuf);
 
 #else
 
@@ -305,7 +305,7 @@ void cpQuit() {
     POWER_MSTPCR0->CMT = 1;
 
 #ifndef CPLIB_ENABLE_NOFRAMEBUF
-    free(pixelBuf);
+    free(cpInternalPixelBuf);
 #endif
 
 #endif
@@ -346,12 +346,12 @@ void cpSetOverclock(cpOverclockMultipliers mul) {
 cpColor cpRGBToColor(uint8_t r, uint8_t g, uint8_t b);
 
 // expects normalized vector
-inline void cpVector3ToAngles(const cpVector3 v, fix16_t* yaw, fix16_t* pitch) {
+void cpVector3ToAngles(const cpVector3 v, fix16_t* yaw, fix16_t* pitch) {
     *yaw = fix16_atan2(v.z, v.x);
     *pitch = fix16_mul(fix16_asin(v.y), fix16_from_int(-1));
 }
 
-inline cpVector3 cpAnglesToVector3(const fix16_t yaw, const fix16_t pitch) {
+cpVector3 cpAnglesToVector3(const fix16_t yaw, const fix16_t pitch) {
     return (cpVector3) {
         fix16_mul(fix16_cos(pitch), fix16_cos(yaw)),
         fix16_sin(pitch),
@@ -359,19 +359,19 @@ inline cpVector3 cpAnglesToVector3(const fix16_t yaw, const fix16_t pitch) {
     };
 }
 
-inline int cpGetScreenWidth() {
-    return screenWidth;
+int cpGetScreenWidth() {
+    return cpInternalScreenWidth;
 }
 
-inline int cpGetScreenHeight() {
-    return screenHeight;
+int cpGetScreenHeight() {
+    return cpInternalScreenHeight;
 }
 
-inline uint16_t* cpGetFramebuffer() {
-    return pixelBuf;
+uint16_t* cpGetFramebuffer() {
+    return cpInternalPixelBuf;
 }
 
-inline void cpBeginDrawing() {
+void cpBeginDrawing() {
 #ifdef TARGET_PC
 
     rlwBeginDrawing();
@@ -394,7 +394,7 @@ void cpEndDrawing() {
     // convert pixels
     for (int i = 0; i < numPixels; i++) {
         // https://stackoverflow.com/questions/2442576/how-does-one-convert-16-bit-rgb565-to-24-bit-rgb888
-        cpColor c = pixelBuf[i];
+        cpColor c = cpInternalPixelBuf[i];
         uint8_t r = ( (c >> 11 & 0b11111) * 527 + 23 ) >> 6;
         uint8_t g = ( (c >> 5 & 0b111111) * 259 + 33 ) >> 6;
         uint8_t b = ( (c & 0b11111) * 527 + 23 ) >> 6;
@@ -450,7 +450,7 @@ void cpEndDrawing() {
 
     // draw pixel buffer
 #ifndef CPLIB_ENABLE_NOFRAMEBUF
-    memcpy(calcVRAM, pixelBuf, (int)sizeof(uint16_t) * numPixels);
+    memcpy(calcVRAM, cpInternalPixelBuf, (int)sizeof(uint16_t) * numPixels);
 #endif
 
     CALC_LCD_Refresh();
@@ -489,20 +489,13 @@ void cpEndDrawing() {
 #endif
 }
 
-inline void cpClearBackground(const cpColor tint) {
+void cpClearBackground(const cpColor tint) {
     for (int i = 0; i < numPixels; i++)
-        pixelBuf[i] = tint;
+        cpInternalPixelBuf[i] = tint;
 }
 
-// no clipping
-inline void cpDrawPixelUnsafe(const int x, const int y, const cpColor tint) {
-    pixelBuf[y*screenWidth + x] = tint;
-}
-
-inline void cpDrawPixel(const int x, const int y, const cpColor tint) {
-    if (x >= 0 && x < screenWidth && y >= 0 && y < screenHeight)
-        pixelBuf[y*screenWidth + x] = tint;
-}
+void cpDrawPixelUnsafe(int x, int y, cpColor tint); // Draw a pixel, no clipping.
+void cpDrawPixel(int x, int y, cpColor tint); // Draw a pixel.
 
 static void cpDrawLineClippedSub(int x1, int y1, int x2, int y2, const cpColor tint) {
     // just a copy of the function below but with clipping
@@ -554,14 +547,14 @@ static void cpDrawLineClippedSub(int x1, int y1, int x2, int y2, const cpColor t
         }
 
         // this is literally the only difference
-        if (sx >= 0 && sx < screenWidth && sy >= 0 && sy < screenHeight)
+        if (sx >= 0 && sx < cpInternalScreenWidth && sy >= 0 && sy < cpInternalScreenHeight)
             cpDrawPixelUnsafe(sx, sy, tint);
     }
 }
 
 void cpDrawLine(int x1, int y1, int x2, int y2, const cpColor tint) {
-    if (x1 < 0 || x1 >= screenWidth || x2 < 0 || x2 >= screenWidth ||
-        y1 < 0 || y1 >= screenHeight || y2 < 0 || y2 >= screenHeight) {
+    if (x1 < 0 || x1 >= cpInternalScreenWidth || x2 < 0 || x2 >= cpInternalScreenWidth ||
+        y1 < 0 || y1 >= cpInternalScreenHeight || y2 < 0 || y2 >= cpInternalScreenHeight) {
         cpDrawLineClippedSub(x1, y1, x2, y2, tint);
         return;
     }
@@ -622,8 +615,8 @@ void cpDrawRectangle(int x, int y, int w, int h, cpColor tint) {
     // clipping
     if (x < 0) x = 0;
     if (y < 0) y = 0;
-    if (x+w >= screenWidth) w = screenWidth-x;
-    if (y+h >= screenHeight) h = screenHeight-y;
+    if (x+w >= cpInternalScreenWidth) w = cpInternalScreenWidth-x;
+    if (y+h >= cpInternalScreenHeight) h = cpInternalScreenHeight-y;
 
     for (int sy = y; sy < y+h; sy++) {
         for (int sx = x; sx < x+w; sx++) {
@@ -643,20 +636,20 @@ void cpDrawCircle(const int centerX, const int centerY, const int radius, const 
 
     while (x >= y) {
         for (int i = centerX - x; i <= centerX + x; i++) {
-            if (i < 0 || i >= screenWidth) continue;
+            if (i < 0 || i >= cpInternalScreenWidth) continue;
 
-            if (centerY + y >= 0 && centerY + y < screenHeight)
+            if (centerY + y >= 0 && centerY + y < cpInternalScreenHeight)
                 cpDrawPixelUnsafe(i, centerY + y, tint);
-            if (centerY - y >= 0 && centerY - y < screenHeight)
+            if (centerY - y >= 0 && centerY - y < cpInternalScreenHeight)
                 cpDrawPixelUnsafe(i, centerY - y, tint);
         }
 
         for (int i = centerX - y; i <= centerX + y; i++) {
-            if (i < 0 || i >= screenWidth) continue;
+            if (i < 0 || i >= cpInternalScreenWidth) continue;
 
-            if (centerY + x >= 0 && centerY + x < screenHeight)
+            if (centerY + x >= 0 && centerY + x < cpInternalScreenHeight)
                 cpDrawPixelUnsafe(i, centerY + x, tint);
-            if (centerY - x >= 0 && centerY - x < screenHeight)
+            if (centerY - x >= 0 && centerY - x < cpInternalScreenHeight)
                 cpDrawPixelUnsafe(i, centerY - x, tint);
         }
 
@@ -673,8 +666,8 @@ void cpDrawCircle(const int centerX, const int centerY, const int radius, const 
 }
 
 static void cpDrawTexture_RGB565(const cpTexture texture, const int x, const int y) {
-    const int tw = x + texture.width >= screenWidth ? screenWidth - x : texture.width;
-    const int th = y + texture.height >= screenHeight ? screenHeight - y : texture.height;
+    const int tw = x + texture.width >= cpInternalScreenWidth ? cpInternalScreenWidth - x : texture.width;
+    const int th = y + texture.height >= cpInternalScreenHeight ? cpInternalScreenHeight - y : texture.height;
 
     for (int ty = y < 0 ? -y : 0; ty < th; ty++) {
         for (int tx = x < 0 ? -x : 0; tx < tw; tx++) {
@@ -693,8 +686,8 @@ static void cpDrawTexture_RGB565(const cpTexture texture, const int x, const int
 }
 
 static void cpDrawTexture_RGB565_A8(const cpTexture texture, const int x, const int y) {
-    const int tw = x + texture.width >= screenWidth ? screenWidth - x : texture.width;
-    const int th = y + texture.height >= screenHeight ? screenHeight - y : texture.height;
+    const int tw = x + texture.width >= cpInternalScreenWidth ? cpInternalScreenWidth - x : texture.width;
+    const int th = y + texture.height >= cpInternalScreenHeight ? cpInternalScreenHeight - y : texture.height;
 
     for (int ty = y < 0 ? -y : 0; ty < th; ty++) {
         for (int tx = x < 0 ? -x : 0; tx < tw; tx++) {
@@ -831,7 +824,7 @@ void cpDrawPixel3d(const cpVector3 pos, const cpColor tint) {
         fix16_to_int(screenCoordFix.y),
     };
 
-    if (screenCoord.x < 0 || screenCoord.x >= screenWidth || screenCoord.y < 0 || screenCoord.y >= screenHeight)
+    if (screenCoord.x < 0 || screenCoord.x >= cpInternalScreenWidth || screenCoord.y < 0 || screenCoord.y >= cpInternalScreenHeight)
         return;
 
     cpDrawPixelUnsafe(
@@ -939,50 +932,50 @@ bool cpCheckCollisionLines(const cpVector2i start1, const cpVector2i end1, const
     return true;
 }
 
-inline bool cpIsKeyDown(const cpKeyIndices keyIdx) {
+bool cpIsKeyDown(const cpKeyIndices keyIdx) {
     return keyState[keyIdx];
 }
 
-inline bool cpIsKeyPressed(const cpKeyIndices keyIdx) {
+bool cpIsKeyPressed(const cpKeyIndices keyIdx) {
     return keyState[keyIdx] && !lastKeyState[keyIdx];
 }
 
-inline bool cpIsKeyUp(const cpKeyIndices keyIdx) {
+bool cpIsKeyUp(const cpKeyIndices keyIdx) {
     return !keyState[keyIdx];
 }
 
-inline bool cpIsKeyReleased(const cpKeyIndices keyIdx) {
+bool cpIsKeyReleased(const cpKeyIndices keyIdx) {
     return !keyState[keyIdx] && lastKeyState[keyIdx];
 }
 
-inline bool cpIsTouchDown() {
+bool cpIsTouchDown() {
     return touchState.isTouchDown;
 }
 
-inline bool cpIsTouchPressed() {
+bool cpIsTouchPressed() {
     return touchState.isTouchDown && !lastTouchState.isTouchDown;
 }
 
-inline bool cpIsTouchUp() {
+bool cpIsTouchUp() {
     return !touchState.isTouchDown;
 }
 
-inline bool cpIsTouchReleased() {
+bool cpIsTouchReleased() {
     return !touchState.isTouchDown && lastTouchState.isTouchDown;
 }
 
-inline int cpGetTouchX() {
+int cpGetTouchX() {
     return touchState.posX;
 }
 
-inline int cpGetTouchY() {
+int cpGetTouchY() {
     return touchState.posY;
 }
 
-inline int cpGetTouchDeltaX() {
+int cpGetTouchDeltaX() {
     return touchState.posX - lastTouchState.posX;
 }
 
-inline int cpGetTouchDeltaY() {
+int cpGetTouchDeltaY() {
     return touchState.posY - lastTouchState.posY;
 }

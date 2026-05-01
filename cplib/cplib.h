@@ -149,6 +149,12 @@ typedef struct {
 #endif
 
 
+// In the header so some things can be inlined.
+
+extern int cpInternalScreenWidth, cpInternalScreenHeight;
+extern cpColor* cpInternalPixelBuf __attribute__((aligned(32))); // alignment for faster memcpy
+
+
 // general
 
 void cpInit(); // Initialize CPLib.
@@ -178,8 +184,19 @@ void cpBeginDrawing(); // Initialize drawing.
 void cpEndDrawing(); // Finish drawing.
 
 void cpClearBackground(cpColor tint); // Clear the background using a given color.
-void cpDrawPixelUnsafe(int x, int y, cpColor tint); // Draw a pixel, no clipping.
-void cpDrawPixel(int x, int y, cpColor tint); // Draw a pixel.
+
+// Draw a single pixel. No clipping.
+// If you draw outside the screen, you might corrupt memory.
+static inline void cpDrawPixelUnsafe(const int x, const int y, const cpColor tint) {
+    cpInternalPixelBuf[y*cpInternalScreenWidth + x] = tint;
+}
+
+// Draw a single pixel.
+static inline void cpDrawPixel(const int x, const int y, const cpColor tint) {
+    if (x >= 0 && x < cpInternalScreenWidth && y >= 0 && y < cpInternalScreenHeight)
+        cpInternalPixelBuf[y*cpInternalScreenWidth + x] = tint;
+}
+
 void cpDrawLine(int x1, int y1, int x2, int y2, cpColor tint); // Draw a line.
 void cpDrawRectangle(int x, int y, int w, int h, cpColor tint); // Draw a rectangle.
 void cpDrawCircle(int centerX, int centerY, int radius, cpColor tint); // Draw a circle.

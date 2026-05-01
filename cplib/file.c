@@ -1,9 +1,8 @@
+#ifdef CPLIB_ENABLE_FILE
+
 #include "common.h"
 #include "file.h"
 
-#include "../emu/common.h"
-
-#ifdef CPLIB_ENABLE_FILE
 
 #ifdef TARGET_PC
 

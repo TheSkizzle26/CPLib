@@ -1,12 +1,12 @@
 #ifndef CPLIB_FONT_H
 #define CPLIB_FONT_H
 
+#ifdef CPLIB_ENABLE_FONT
+
 #include "vector.h"
 #include "common.h"
 #include "rect.h"
 
-
-#ifdef CPLIB_ENABLE_FONT
 
 typedef struct {
     int width;
