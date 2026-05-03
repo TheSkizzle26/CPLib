@@ -232,14 +232,16 @@ bool cpIsKeyPressed(cpKeyIndices keyIdx); // Has a key just been pressed?
 bool cpIsKeyUp(cpKeyIndices keyIdx); // Is a key up?
 bool cpIsKeyReleased(cpKeyIndices keyIdx); // Has a key just been released?
 
-bool cpIsTouchDown(); // Is the screen touched?
-bool cpIsTouchPressed(); // Has the screen just been touched?
-bool cpIsTouchUp(); // Is the screen not touched?
-bool cpIsTouchReleased(); // Has the screen just been untouched?
-int cpGetTouchX(); // Get the touch x position, 0 if not touched.
-int cpGetTouchY(); // Get the touch y position, 0 if not touched.
-int cpGetTouchDeltaX(); // Get the difference between the current and last touch x.
-int cpGetTouchDeltaY(); // Get the difference between the current and last touch y.
+/* Removed for now.
+    bool cpIsTouchDown(); // Is the screen touched?
+    bool cpIsTouchPressed(); // Has the screen just been touched?
+    bool cpIsTouchUp(); // Is the screen not touched?
+    bool cpIsTouchReleased(); // Has the screen just been untouched?
+    int cpGetTouchX(); // Get the touch x position, 0 if not touched.
+    int cpGetTouchY(); // Get the touch y position, 0 if not touched.
+    int cpGetTouchDeltaX(); // Get the difference between the current and last touch x.
+    int cpGetTouchDeltaY(); // Get the difference between the current and last touch y.
+*/
 
 
 #endif //CPLIB_CPLIB_H

@@ -177,11 +177,13 @@ typedef struct {
     fix16_t focalLength;
 } cpInternalCamera3d;
 
-typedef struct {
-    int posX;
-    int posY;
-    bool isTouchDown;
-} cpInternalTouchState;
+/*
+    typedef struct {
+        int posX;
+        int posY;
+        bool isTouchDown;
+    } cpInternalTouchState;
+*/
 
 // internally used variables
 static int numPixels;
@@ -190,8 +192,8 @@ cpColor* cpInternalPixelBuf __attribute__((aligned(32))); // alignment for faste
 
 static bool keyState[NUM_KEYS];
 static bool lastKeyState[NUM_KEYS];
-static cpInternalTouchState touchState;
-static cpInternalTouchState lastTouchState;
+// static cpInternalTouchState touchState;
+// static cpInternalTouchState lastTouchState;
 
 static cpInternalCamera3d internalCamera3d;
 
@@ -266,17 +268,18 @@ void cpInit() {
         lastKeyState[i] = false;
     }
 
-    // init touch state
-    touchState = (cpInternalTouchState) {
-        0,
-        0,
-        false
-    };
-    lastTouchState = (cpInternalTouchState) {
-        0,
-        0,
-        false
-    };
+    /* // init touch state
+        touchState = (cpInternalTouchState) {
+            0,
+            0,
+            false
+        };
+        lastTouchState = (cpInternalTouchState) {
+            0,
+            0,
+            false
+        };
+    */
 
     // load default font
 #ifdef CPLIB_ENABLE_FONT
@@ -387,7 +390,7 @@ void cpBeginDrawing() {
 
 void cpEndDrawing() {
     memcpy(lastKeyState, keyState, sizeof(bool) * NUM_KEYS);
-    memcpy(&lastTouchState, &touchState, sizeof(cpInternalTouchState));
+    // memcpy(&lastTouchState, &touchState, sizeof(cpInternalTouchState));
 
 #ifdef TARGET_PC
 
@@ -415,14 +418,16 @@ void cpEndDrawing() {
         keyState[i] = rlwIsKeyDown(keyCodes[i]);
     }
 
-    // fetch touch state
-    if ((touchState.isTouchDown = rlwIsMouseButtonDown())) {
-        touchState.posX = rlwGetMouseX();
-        touchState.posY = rlwGetMouseY();
-    } else {
-        touchState.posX = 0;
-        touchState.posY = 0;
-    }
+    /*
+        // fetch touch state
+        if ((touchState.isTouchDown = rlwIsMouseButtonDown())) {
+            touchState.posX = rlwGetMouseX();
+            touchState.posY = rlwGetMouseY();
+        } else {
+            touchState.posX = 0;
+            touchState.posY = 0;
+        }
+    */
 
     // set window title (no stdlib, sadly)
     char title[32] = "CPLib emu | FPS: ";
@@ -465,22 +470,24 @@ void cpEndDrawing() {
         keyState[i] = !!((i < 10 ? key1 : key2) & keycode);
     }
 
-    calcInputEvent inputEvent = {0};
-    CALC_GetInput(&inputEvent, 0xFFFFFFFF, 0x10);
-    touchState.isTouchDown = false;
-    if (inputEvent.type == 0x4000) {
-        if (inputEvent.data.touch_single.direction == 1 /* TOUCH_DOWN */ ||
-            inputEvent.data.touch_single.direction == 2 /* TOUCH_HOLD_DRAG */)
-            touchState.isTouchDown = true;
-    }
+    /*
+        calcInputEvent inputEvent = {0};
+        CALC_GetInput(&inputEvent, 0xFFFFFFFF, 0x10);
+        touchState.isTouchDown = false;
+        if (inputEvent.type == 0x4000) {
+            if (inputEvent.data.touch_single.direction == 1 ||      // TOUCH_DOWN
+                inputEvent.data.touch_single.direction == 2 )       // TOUCH_HOLD_DRAG
+                touchState.isTouchDown = true;
+        }
 
-    if (touchState.isTouchDown) {
-        touchState.posX = inputEvent.data.touch_single.p1_x;
-        touchState.posY = inputEvent.data.touch_single.p1_y;
-    } else {
-        touchState.posX = 0;
-        touchState.posY = 0;
-    }
+        if (touchState.isTouchDown) {
+            touchState.posX = inputEvent.data.touch_single.p1_x;
+            touchState.posY = inputEvent.data.touch_single.p1_y;
+        } else {
+            touchState.posX = 0;
+            touchState.posY = 0;
+        }
+    */
 
     // wait till we reach our target fps
     if (!fpsUnlocked)
@@ -948,34 +955,36 @@ bool cpIsKeyReleased(const cpKeyIndices keyIdx) {
     return !keyState[keyIdx] && lastKeyState[keyIdx];
 }
 
-bool cpIsTouchDown() {
-    return touchState.isTouchDown;
-}
+/*
+    bool cpIsTouchDown() {
+        return touchState.isTouchDown;
+    }
 
-bool cpIsTouchPressed() {
-    return touchState.isTouchDown && !lastTouchState.isTouchDown;
-}
+    bool cpIsTouchPressed() {
+        return touchState.isTouchDown && !lastTouchState.isTouchDown;
+    }
 
-bool cpIsTouchUp() {
-    return !touchState.isTouchDown;
-}
+    bool cpIsTouchUp() {
+        return !touchState.isTouchDown;
+    }
 
-bool cpIsTouchReleased() {
-    return !touchState.isTouchDown && lastTouchState.isTouchDown;
-}
+    bool cpIsTouchReleased() {
+        return !touchState.isTouchDown && lastTouchState.isTouchDown;
+    }
 
-int cpGetTouchX() {
-    return touchState.posX;
-}
+    int cpGetTouchX() {
+        return touchState.posX;
+    }
 
-int cpGetTouchY() {
-    return touchState.posY;
-}
+    int cpGetTouchY() {
+        return touchState.posY;
+    }
 
-int cpGetTouchDeltaX() {
-    return touchState.posX - lastTouchState.posX;
-}
+    int cpGetTouchDeltaX() {
+        return touchState.posX - lastTouchState.posX;
+    }
 
-int cpGetTouchDeltaY() {
-    return touchState.posY - lastTouchState.posY;
-}
+    int cpGetTouchDeltaY() {
+        return touchState.posY - lastTouchState.posY;
+    }
+*/

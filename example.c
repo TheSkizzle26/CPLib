@@ -243,17 +243,19 @@ void render() {
         cpDrawText(name, 0, i*10, 1, CP_WHITE);
     }
 
-    // draw circle at touch pos
-    cpColor color;
-    if (cpIsTouchDown()) color = CP_ORANGE;
-    else color = CP_WHITE;
+    /* Removed for now.
+        // draw circle at touch pos
+        cpColor color;
+        if (cpIsTouchDown()) color = CP_ORANGE;
+        else color = CP_WHITE;
 
-    cpDrawCircle(
-        cpGetTouchX(),
-        cpGetTouchY(),
-        10,
-        color
-    );
+        cpDrawCircle(
+            cpGetTouchX(),
+            cpGetTouchY(),
+            10,
+            color
+        );
+    */
 
     cpEndDrawing();
 }
