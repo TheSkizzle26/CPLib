@@ -334,7 +334,7 @@ void cpSetTargetFPS(const int value) {
 #endif
 }
 
-void cpSetOverclock(cpOverclockMultipliers mul [[maybe_unused]]) {
+void cpSetOverclock(const cpOverclockMultipliers mul [[maybe_unused]]) {
 #ifndef TARGET_PC
 
     cpg_set_pll_mul(mul);
