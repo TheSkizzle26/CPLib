@@ -334,16 +334,12 @@ void cpSetTargetFPS(const int value) {
 #endif
 }
 
-void cpSetOverclock(cpOverclockMultipliers mul) {
-#ifdef TARGET_PC
-
-    mul *= 1; // don't throw unused warning
-
-#else
+void cpSetOverclock(cpOverclockMultipliers mul [[maybe_unused]]) {
+#ifndef TARGET_PC
 
     cpg_set_pll_mul(mul);
 
-#endif
+    #endif
 }
 
 cpColor cpRGBToColor(uint8_t r, uint8_t g, uint8_t b);
