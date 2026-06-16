@@ -84,7 +84,7 @@ static void buildPath(char out[BUF_SIZE],
     }
 
 #ifndef TARGET_PC
-    for (int i = 0; i < strlen(temp); i++) {
+    for (size_t i = 0; i < strlen(temp); i++) {
         if (temp[i] == '/')
             temp[i] = '\\';
     }
@@ -551,7 +551,7 @@ bool cpIsDirectory(const char* path) {
     int findHandle;
 
     wchar_t pathWChar[strlen(fullPath)+1];
-    for (int i = 0; i < strlen(fullPath)+1; i++)
+    for (size_t i = 0; i < strlen(fullPath)+1; i++)
         pathWChar[i] = (wchar_t)fullPath[i];
 
     wchar_t name[BUF_SIZE]; // crashes without this?
@@ -614,7 +614,7 @@ void cpListDirectory(const char* path, cpListDirResult* result) {
 
     strcat(fullPath, "\\*");
     wchar_t fullPathWChar[BUF_SIZE];
-    for (int i = 0; i < strlen(fullPath)+1; i++) {
+    for (size_t i = 0; i < strlen(fullPath)+1; i++) {
         fullPathWChar[i] = (wchar_t)fullPath[i];
     }
 

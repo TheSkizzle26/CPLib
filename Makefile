@@ -16,15 +16,19 @@ MAKEFLAGS := --jobs=$(shell nproc)
 C_PC := gcc
 C_PC_FLAGS := -W -Wall -DTARGET_PC -lraylib -std=$(C_VERSION) -$(OPTIMIZATION_LEVEL) $(FIXPOINT_DEFS) $(CPLIB_FEATURES)
 
+INCLUDES := -I $(SDK_DIR)/include -I $(SDK_DIR)/newlib/sh4-elf/include
+
 #The sh4 assembler, compiler and linker:
 AS := sh4-elf-as
 AS_FLAGS :=
 
+# may need to use -fno-builting later
+
 CC := sh4-elf-gcc
-CC_FLAGS := -ffreestanding -fshort-wchar -Wall -Wextra -fno-builtin-memcpy -std=$(C_VERSION) -$(OPTIMIZATION_LEVEL) $(FIXPOINT_DEFS) $(CPLIB_FEATURES)
+CC_FLAGS := -ffreestanding -fshort-wchar -Wall -Wextra -std=$(C_VERSION) -$(OPTIMIZATION_LEVEL) $(INCLUDES) $(FIXPOINT_DEFS) $(CPLIB_FEATURES)
 
 CXX := sh4-elf-g++
-CXX_FLAGS := -ffreestanding -fno-exceptions -fno-rtti -fshort-wchar -Wall -Wextra -fno-builtin-memcpy -std=$(C_VERSION) -$(OPTIMIZATION_LEVEL) $(FIXPOINT_DEFS) $(CPLIB_FEATURES)
+CXX_FLAGS := -ffreestanding -fno-exceptions -fno-rtti -fshort-wchar -Wall -Wextra -std=$(C_VERSION) -$(OPTIMIZATION_LEVEL) $(INCLUDES) $(FIXPOINT_DEFS) $(CPLIB_FEATURES)
 
 LD := sh4-elf-gcc
 LD_FLAGS := -nostartfiles -nostdlib
