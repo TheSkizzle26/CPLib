@@ -1,6 +1,9 @@
 # CPLib
 A library for drawing, input, etc. for the ClassPad II calculator.\
-Runs on both the calculator and your PC!
+Runs on both the calculator and your PC!\
+
+# Important
+Even though this library works pretty well, the underlying code structure is a bit messy at times and need to be reworked.
 
 # How to use
 Just copy the "cplib" folder into your project.\
